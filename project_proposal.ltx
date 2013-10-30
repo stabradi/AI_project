@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage{natbib}
 \usepackage{amsmath}
 \usepackage{tabularx}
 \author{Dolan Murvihill \and Mark Chaoui \and Sam Abradi}
@@ -25,7 +26,7 @@ they were the best. Our project seeks to use an intelligent system to develop a 
 
 \section{Background}
 \subsection{TCP Congestion Control}
-RFC 5681 specifies a congestion control mechanism for TCP called additive-increase/multiplicative-decrease (AIMD) to avoid flooding networks with more traffic than they can carry. Sending more data through a link than it is able to handle causes packet loss, introducing significant amounts of waste traffic which will consume resources without improving end to end data throughput. The congestion control mechanism currently used in TCP is known as the sliding window. The sliding window keeps track of the number of packets sent-but-not-acknowleged, and only allows $n$ packets to be in this state. When a packet is successfully acknowleged, $n$ is increased by one (additive increase); conversely, when a packet is lost, requiring retransmission, $n$ is halved (multiplicative decrease). AIMD produces a traffic profile called a ``sawtooth", in which the send rate is always approaching the current available network capacity.
+RFC 5681 specifies a congestion control mechanism for TCP called additive-increase/multiplicative-decrease (AIMD) to avoid flooding networks with more traffic than they can carry. Sending more data through a link than it is able to handle causes packet loss, introducing significant amounts of waste traffic which will consume resources without improving end to end data throughput. The congestion control mechanism currently used in TCP is known as the sliding window. The sliding window keeps track of the number of packets sent-but-not-acknowledged, and only allows $n$ packets to be in this state. When a packet is successfully acknowledged, $n$ is increased by one (additive increase); conversely, when a packet is lost, requiring retransmission, $n$ is halved (multiplicative decrease). AIMD produces a traffic profile called a ``sawtooth", in which the send rate is always approaching the current available network capacity.
 
 \subsection{Genetic Algorithms}
 In brief, a genetic algorithm analyzes a number of candidates from a set of possible actions, selects the best, n as determined by some fitness function, ``breeds'' them by intermixing parts of two candidates and introducing mutation to avoid local minima, and then repeats for another trial. Our project aims to create a neural network by applying a genetic algorithm that uses a fitness function to judge the overall virtue of the control mechanism network as it applies to the network.
@@ -59,7 +60,7 @@ delay/reliability properties will be as similar as possible to the
 Internet. The simulation network will monitor and record network 
 performance data for later analysis.
 \subsection{Congestion Control Neural Net and Genetic Algorithm}
-On page 2 of their paper, Winstein and Balakrishnan used a genetic algorithm to inform a neural network that affected TCP ex Machina's congestion control properties, Their reasoning, as they say, was that ``the best way to approach this question is to take the design of specific algorithmic mechanisms out of the hands of human designers (no matter how sophisticated!), and make the end-to-end algorithm be a function of the desired overall behavior." We agree with their reasoning, and commend their eloquence.
+On page 2 of their paper, Winstein and Balakrishnan used a genetic algorithm to inform a neural network that affected TCP ex Machina's congestion control properties, Their reasoning, as they say, was that ``the best way to approach this question is to take the design of specific algorithmic mechanisms out of the hands of human designers (no matter how sophisticated!), and make the end-to-end algorithm be a function of the desired overall behavior." We agree with their reasoning, and commend their eloquence. We will use their methods and mindset to generate our own research, which will expand on their work, generalizing their solution to cases where only partial adoption of our mechanism exists. We will also use a genetic algorithm, though ours will have to account for varying degrees of adoption. This way, routers that use our mechanism can exist in harmony with those that do not.
 \section{Proposed Experiments}
 Each generation of our genetic algorithm will measure the performance of each candidate mechanism in the simulated network at several different adoption rates. We will define good performance as a function of each end host's utility, based on latency, throughput, and reliability; a good mechanism will score better on average at all or almost all adoption rates among both adopters and non-adopters. The overall utility of the simulation will be a function of the utility of each end host, which is itself a function of that user's throughput, latency, and reliability characteristics. Our genetic algorithm will use a fitness function based on total simulation utility at each adoption rate, with low adoption rates weighted more.
 \subsection{Expected Results}
@@ -85,7 +86,7 @@ Date & Milestone \\
 \end{tabularx}
 \section{Further Reading}
 
-\bibliography{Sources}{}
+\bibliography{Sources}
 \bibliographystyle{plain}
 \end{document}
 
