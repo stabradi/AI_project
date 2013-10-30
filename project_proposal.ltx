@@ -6,19 +6,16 @@
 \begin{document}
 \maketitle
 \section*{Abstract}
-Recent research has used AI to identify alternative congestion control
-mechanisms for TCP that resulted in significant performance increase;
+Recent research has used Artificial Intelligence(AI) to identify alternative congestion control
+mechanisms for Transmission Control Protocol(TCP) that resulted in significant performance increase;
 however, the mechanisms in question were only tested at full (100\%)
-adoption, leaving a nigh-insurmountable barrier of entry. Our research runs along
+adoption, leaving a nigh-insurmountable barrier of entry for the revised protocol. Our research runs along
 similar lines, but seeks to find alternative mechanisms
 that improve performance on networks that do not have full
 adoption without adversely affecting those who do not adopt. We expect to find
 some alternative mechanisms that achieve better performance than the current
 TCP congestion control mechanism at many or all adoption rates.
 \section{Background and Introduction}
-\subsection{AI background}
-At its root, a genetic algorithm analyzes a number of candidates, selects the best
-n as determined by some fitness function, ``breeds'' them by intermixing parts of two candidates with some random values added in to keep away from local minima, and then repeats for another trial. Our project aims to create a neural network by applying a genetic algorithm that uses a fitness function to judge the overall virtue of the control mechanism network as it applies to the network.
 \subsection{motive}
 Many aspects of TCP's existing congestion control mechanism appear to have
 been selected out of convenience rather than carefully chosen to maximize performance.
@@ -27,6 +24,14 @@ packet transmission increases the sliding window by one, while each dropped pack
 it in half. It seems many parameters were chosen because they were simple, not because
 they were the best.
 
+\subsection{TCP Congestion Control}
+TCP does a thing and that helps congestion.
+
+\subsection{Genetic Algorithms and Neural Nets}
+At its root, a genetic algorithm analyzes a number of candidates, selects the best
+n as determined by some fitness function, ``breeds'' them by intermixing parts of two candidates with some random values added in to keep away from local minima, and then repeats for another trial. Our project aims to create a neural network by applying a genetic algorithm that uses a fitness function to judge the overall virtue of the control mechanism network as it applies to the network.
+
+\subsection{Related Work}
 TCP ex Machina is a suggested TCP congestion control mechanism created in 2013 by Keith 
 Winstein and Hari Balakrishnan, from MIT, with the help of a neural net informed by a
 genetic algorithm. While their simulations found TCP ex Machina's network performance was
@@ -39,29 +44,29 @@ genetic algorithm that will seek to optimize performance at all adoption levels,
 control mechanism that is not only better in theory, but also more likely to be adopted in practice.
 \section{Proposed Work}
 % Replace Winstein and Balakrishnan with special citation command
-We propose to generate an improved TCP congestion control mechanism using a genetic algorithm similar to the approach outlined by Winstein and Balakrishnan, with the special requirement that the algorithm must perform well at low adoption rates for both adopters and non-adopters. We will define good performance by testing the mechanism on a simulated network, and measuring each end host's utility based on latency, throughput, and reliability; a good mechanism will score better on average at all or almost all adoption rates among both adopters and non-adopters.
+We propose to generate an improved TCP congestion control mechanism using a genetic algorithm similar to the approach outlined by Winstein and Balakrishnan, with the special requirement that the algorithm must perform well \textit{at low adoption rates} for both adopters and non-adopters. We will define good performance by testing the mechanism on a simulated network, and measuring each end host's utility based on latency, throughput, and reliability; a good mechanism will score better on average at all or almost all adoption rates among both adopters and non-adopters.
 \subsection{Simulation Network}
 Any structured machine learning algorithm needs to be able to evaluate 
-the performance of an action, and to evaluate performance an agent 
+the performance results of an action, and to evaluate performance an agent 
 needs data. We propose to create a program that will simulate a wide-area 
-network (WAN) with properties that resemble the Internet. The 
+network (WAN) with properties that resemble the Internet, or find an existing simulator. The 
 program will use a directed graph to represent the simulation network,
 with nodes representing hosts and edges representing links. Some nodes
 will be end hosts which try to open TCP connections with one another 
 and transmit data, and other nodes will be routers which try to 
-faithfully carry the packets. All four types of network delay 
+faithfully carry packets. All four types of network delay 
 (propagation delay, processing delay, transmission delay, and queuing 
 delay) will be represented, and both links and routers will introduce
-noise and corrupt packets. Where possible, the network topology and 
+noise to corrupt packets. Where possible, the network topology and 
 delay/reliability properties will be as similar as possible to the 
 Internet. The simulation network will monitor and record network 
 performance data for later analysis.
 \subsection{Congestion Control Neural Net and Genetic Algorithm}
-In their paper, Winstein and Balakrishnan used a genetic algorithm to inform a neural network that affected the TCP congestion control properties, Their reasoning, as they say, was that ``the best way to approach this question is to take the design of specific algorithmic mechanisms out of the hands of human designers (no matter how sophisticated!), and make the end-to-end algorithm be a function of the desired overall behavior." We agree with their reasoning, and commend their eloquence.
+On page 2 of their paper, Winstein and Balakrishnan used a genetic algorithm to inform a neural network that affected the TCP ex Machina's congestion control properties, Their reasoning, as they say, was that ``the best way to approach this question is to take the design of specific algorithmic mechanisms out of the hands of human designers (no matter how sophisticated!), and make the end-to-end algorithm be a function of the desired overall behavior." We agree with their reasoning, and commend their eloquence.
 \section{Proposed Experiments}
-We will run our genetic algorithms For each generation, we will measure the performance of each candidate algorithm in the simulated network at several different mechanism rates. The overall utility of the simulation will be a function of the utility of each user, which is itself a function of that user's throughput, latency, and reliability characteristics. Our genetic algorithm will use the fitness function based on total simulation utility at each adoption rate, with low adoption rates weighted more.
+We will run our genetic algorithms For each generation, we will measure the performance of each candidate mechanism in the simulated network at several different adoption rates. The overall utility of the simulation will be a function of the utility of each user, which is itself a function of that user's throughput, latency, and reliability characteristics. Our genetic algorithm will use a fitness function based on total simulation utility at each adoption rate, with low adoption rates weighted more.
 \subsection{Expected Results}
-We are hesitant to speculate as to what congestion control mechanisms will perform best, but as Winstein and Balakrishnan found, we expect to find significant room for improvement over current TCP standards, even at low adoption rates. The mechanism that results from this may be too difficult to comprehend; this was the case for Winstein and Balakrishnan, and will most likely be the case for us. In the end, it is possible that no mechanism improves congestion control for all adoption levels, that one strictly dominates all possibilities, or several excel at different areas. If we cannot hope to comprehend the solution, the chances are slim that we could accurately predict them.
+We are hesitant to speculate as to what congestion control mechanisms will perform best, but as Winstein and Balakrishnan found, we expect to find significant room for improvement over current TCP standards, even at low adoption rates. The neural network that results from our work may be too difficult to comprehend, as was the case for Winstein and Balakrishnan. If we cannot hope to comprehend the solution, the chances are slim that we could accurately predict them. In the end, three posibilites exist: \begin{enumerate} \item no mechanism improves congestion control for all adoption levels. \item one mechanism strictly dominates all possibilities. \item several excel at different areas. \end{enumerate}
 \section{Schedule}
 \section{Citations}
 \end{document}
