@@ -1,31 +1,38 @@
 \documentclass{article}
 \author{Dolan Murvihill \and Mark Chaoui \and Sam Abradi}
-\title{Project Proposal: Performance tuning of TCP}
+\title{Project Proposal: Performance tuning of TCP Congestion Control}
 \date{30 October 2013}
-
+%TODO replace paragraph indents with spacing
 \begin{document}
 \maketitle
-\section{Abstract}
-	TCP's constant parameters don't have any research backing them up. While
-	better values for the constants have been found, they are not practical
-	to implement. Our research aims to find optimize the TCP parameters in 
-	such a way to maximize efficiency on systems that do not have full
-	adoption while not harming those who don't adopt. We expect to find
-	some values that may or may not be similar to the full adoption rate
-	values that achieve overall better performance values than the current
-	TCP parameters.
+\section*{Abstract}
+	Recent research has used AI to identify alternative congestion control
+        mechanisms for TCP that resulted in significant performance increase;
+        however, the mechanisms in question were only tested at one hundred percent
+        adoption, leaving a nigh-insurmountable barrier of entry. Our research runs along
+        similar lines, but seeks to find alternative mechanisms
+        that improve performance on networks that do not have full
+	adoption without adversely affecting those who do not adopt. We expect to find
+	some alternative mechanisms that achieve better performance than the current
+	TCP congestion control mechanism at many or all adoption rates.
 \section{Background and Introduction}
-	Many of the constant parameters used in TCP seem arbirtrary and unfounded
-	in good	scientific research. For instance, the additive increase constant 
-	is one and the multiplicative deacrease is 1/2. These values were chosen 
-	because they were simple and not because they were the best. In the 
-	research "Deus ex TCP" by Winstein and Balakrishnan, they use genetic
-	algorithms to find the optimal values for all TCP parameters. While the
-	values they found worked better than current ones, they did not	explore
-	the case where only	some routers adopted optimized parameters and others 
-	did not. Unfortunately, the chances of their changes being adopted are
-	slim, as old routers would no longer be guarateed to function optimally.
-	
+        Many aspects of TCP's existing congestion control mechanism appear to have
+        been selected out of convenience rather than carefully chosen to maximize performance.
+        For instance, when in the additive-increase/multiplicative-decrease mode, each successful
+        packet transmission increases the sliding window by one, while each dropped packet cuts
+        it in half. It seems many parameters were chosen because they were simple, not because
+        they were the best.
+
+        TCP ex Machina is a suggested TCP congestion control mechanism created in 2013 by Keith 
+        Winstein and Hari Balakrishnan, from MIT, with the help of a neural net informed by a
+        genetic algorithm. While their simulations found TCP ex Machina's network performance was
+        better than current TCP congestion control, they only simulated performance in the case of 100%
+        adoption. Since full adoption never happens immediately in real life, a mechanism that is only optimized
+        for 100% adoption will not be adopted in the first place.
+
+        We seek to address the gap in Winstein's and Balakrishnan's research by creating a different
+        genetic algorithm that will seek to optimize performance at all adoption levels, creating a congestion
+        control mechanism that is not only better in theory, but also more likely to be adopted in practice.
 	
 \section{Proposed Work}
 % Replace Winstein and Balakrishnan with special citation command
@@ -47,7 +54,7 @@
 		Internet. The simulation network will monitor and record network 
 		performance data for later analysis.
 	\subsection{Congestion Control Neural Net and Genetic Algorithm}
-		In their paper, Winstein and Balakrishnan used a genetic algorithm to inform a neural network that affected the TCP congestion control properties, Their reasoning, as they say, was that "the best way to approach this question is to take the design of specific algorithmic mechanisms out of the hands of human designers (no mater how sophisticated!), and make the end-to-end algorithm be a function of the desired overall behavior." We agree with their reasoning, and commend their eloquence.
+		In their paper, Winstein and Balakrishnan used a genetic algorithm to inform a neural network that affected the TCP congestion control properties, Their reasoning, as they say, was that ``the best way to approach this question is to take the design of specific algorithmic mechanisms out of the hands of human designers (no mater how sophisticated!), and make the end-to-end algorithm be a function of the desired overall behavior." We agree with their reasoning, and commend their eloquence.
 			    
 \section{Proposed Experiments}
 	For each generation, we will measure the performance of each candidate algorithm in the simulated network at several different adoption rates. The total utility of the simulation will be a function of the total utility of each user, which is itself a function of that user's throughput, latency, and reliability characteristics. The fitness function our genetic algorithm uses will be based on total simulation utility at each adoption rate, with low adoption rates weighted more.
