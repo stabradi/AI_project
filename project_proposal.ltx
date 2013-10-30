@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{natbib}
 \usepackage{amsmath}
+\usepackage{tabularx}
 \author{Dolan Murvihill \and Mark Chaoui \and Sam Abradi}
 \title{Project Proposal: Performance tuning of TCP Congestion Control}
 \date{30 October 2013}
@@ -65,11 +66,26 @@ Each generation of our genetic algorithm will measure the performance of each ca
 \subsection{Expected Results}
 We are hesitant to speculate as to what congestion control mechanisms will perform best, but as Winstein and Balakrishnan found, we expect to find significant room for improvement over RFC 5681, even at low adoption rates. The neural network that results from our work may be too difficult to easily comprehend, as was the case for Winstein and Balakrishnan. If we cannot hope to comprehend the solution, the chances are slim that we could accurately predict them. In the end, three possibilites exist: \begin{enumerate} \item no mechanism improves congestion control for all adoption levels. \item one mechanism strictly dominates all possibilities. \item different mechanisms excel at different perfomance criteria. \end{enumerate}
 \section{Schedule}
-\begin{enumerate} \item[Sun 3] Simulation testbed specification, test plan, API \item[Sun 10] Simulation Testbed 0.5, which can monitor a TCP connection between 2 end hosts through a router. \item[Sun 17] Finish Simulation Tesbed \item[Sun 24] AI 0.5 \item[Sun 1] AI finished \item[Sun 8] Data Collection finished \item[Wed 11] Report Finished \end{enumerate}
-\section{Citations}
+\begin{tabularx}
+\textwidth{X XXXXXX}
+Date & Milestone \\
+\hline
+3 Nov & - Simulation testbed specification, test plan, API reference, and detailed implementation schedule \\
+\hline
+10 Nov & - Simulation testbed 0.5; testbed can monitor a TCP connection between two end hosts through a router \\
+\hline
+17 Nov & - Simulation testbed 1.0; implemented completely to spec \newline - specification, test plan, API reference, and detailed implementation schedule for AI component \\
+\hline
+24 Nov & - AI component 0.5; fully working neural network informs host performance, responds correctly to API calls from toy genetic algorithm \\
+\hline
+1 Dec & - AI component 1.0; implemented completely to spec \newline - detailed experimental procedure, including any applicable source code \\
+\hline
+8 Dec & - Data collection finished \\
+\hline
+12 Dec & - Paper and presentation \\
+\end{tabularx}
+\section{Further Reading}
  \hangindent=0.7cm Keith Winstein and Hari Balakrishnan. 2013. TCP ex machina: computer-generated congestion control. In Proceedings of the ACM SIGCOMM 2013 conference on SIGCOMM (SIGCOMM '13). ACM, New York, NY, USA, 123-134. DOI=10.1145/2486001.2486020 http://doi.acm.org/10.1145/2486001.2486020 \newline
-
-
 \flushleft \hangindent=0.7cm M. Allman, V. Paxman, and E. Blanton. TCP Congestion Control. IETF, RFC 5681. September 2009 available: http://tools.ietf.org/html/rfc5681
 
 \bibliography{Sources}
