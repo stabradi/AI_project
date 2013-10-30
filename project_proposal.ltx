@@ -8,7 +8,7 @@
 \section*{Abstract}
 Recent research has used AI to identify alternative congestion control
 mechanisms for TCP that resulted in significant performance increase;
-however, the mechanisms in question were only tested at one hundred percent
+however, the mechanisms in question were only tested at full (100\%)
 adoption, leaving a nigh-insurmountable barrier of entry. Our research runs along
 similar lines, but seeks to find alternative mechanisms
 that improve performance on networks that do not have full
@@ -17,8 +17,8 @@ some alternative mechanisms that achieve better performance than the current
 TCP congestion control mechanism at many or all adoption rates.
 \section{Background and Introduction}
 \subsection{AI background}
-The basic concept of a genetic algorithm is an algorithm that analyzes a number of candidates, selects the best
-n as determined by some fitness function, ``breeds'' them by intermixing parts of two candidates, with some random values added in to keep away from local minima, and then repeats for another trial. Our project aims to create a neural network by applying a genetic algorithm that uses a fitness function to judge the overall virtue of the control mechanism network as it applies to the network.
+At its root, a genetic algorithm analyzes a number of candidates, selects the best
+n as determined by some fitness function, ``breeds'' them by intermixing parts of two candidates with some random values added in to keep away from local minima, and then repeats for another trial. Our project aims to create a neural network by applying a genetic algorithm that uses a fitness function to judge the overall virtue of the control mechanism network as it applies to the network.
 \subsection{motive}
 Many aspects of TCP's existing congestion control mechanism appear to have
 been selected out of convenience rather than carefully chosen to maximize performance.
@@ -30,9 +30,9 @@ they were the best.
 TCP ex Machina is a suggested TCP congestion control mechanism created in 2013 by Keith 
 Winstein and Hari Balakrishnan, from MIT, with the help of a neural net informed by a
 genetic algorithm. While their simulations found TCP ex Machina's network performance was
-better than current TCP congestion control, they only simulated performance in the case of 100\%
+better than current TCP congestion control, they only simulated performance in the case of full
 adoption. Since full adoption never happens immediately in real life, a mechanism that is only optimized
-for 100\% adoption will not be adopted in the first place.
+for full adoption will not be adopted in the first place.
 
 We seek to address the gap in Winstein's and Balakrishnan's research by creating a different
 genetic algorithm that will seek to optimize performance at all adoption levels, creating a congestion
@@ -43,8 +43,8 @@ We propose to generate an improved TCP congestion control mechanism using a gene
 \subsection{Simulation Network}
 Any structured machine learning algorithm needs to be able to evaluate 
 the performance of an action, and to evaluate performance an agent 
-needs data. We propose to create a program that will simulate a wide-
-area network (WAN) with properties that resemble the Internet. The 
+needs data. We propose to create a program that will simulate a wide-area 
+network (WAN) with properties that resemble the Internet. The 
 program will use a directed graph to represent the simulation network,
 with nodes representing hosts and edges representing links. Some nodes
 will be end hosts which try to open TCP connections with one another 
