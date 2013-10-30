@@ -16,7 +16,7 @@ adoption without adversely affecting those who do not adopt. We expect to find
 some alternative mechanisms that achieve better performance than the current
 TCP congestion control mechanism at many or all adoption rates.
 \section{Background and Introduction}
-\subsection{motive}
+\subsection{Motive}
 Many aspects of TCP's existing congestion control mechanism appear to have
 been selected out of convenience rather than carefully chosen to maximize performance.
 For instance, when in the additive-increase/multiplicative-decrease mode, each successful
@@ -25,7 +25,7 @@ it in half. It seems many parameters were chosen because they were simple, not b
 they were the best.
 
 \subsection{TCP Congestion Control}
-TCP does a thing and that helps congestion.
+TCP speifies a congestion control mechanism to prevent saturating networks with more traffic than is sustainable. Sending more data through a link than it is able to handle produces significant amounts of waste traffic which will soak up resources without any end to end data transmission. The congestion control mechanism currently used is known as the sliding window. The sliding window keeps track of the number of packets sent-but-not-acknowleged, and only allows n packets to be in this state. When a packet is successfully acknowleged, n is increased by 1; conversely, when packets begin to require retransmission n is halved. This produces a traffic profile in which the send rate is always approaching the current available capacity.
 
 \subsection{Genetic Algorithms and Neural Nets}
 At its root, a genetic algorithm analyzes a number of candidates, selects the best
@@ -44,7 +44,7 @@ genetic algorithm that will seek to optimize performance at all adoption levels,
 control mechanism that is not only better in theory, but also more likely to be adopted in practice.
 \section{Proposed Work}
 % Replace Winstein and Balakrishnan with special citation command
-We propose to generate an improved TCP congestion control mechanism using a genetic algorithm similar to the approach outlined by Winstein and Balakrishnan, with the special requirement that the algorithm must perform well \textit{at low adoption rates} for both adopters and non-adopters. We will define good performance by testing the mechanism on a simulated network, and measuring each end host's utility based on latency, throughput, and reliability; a good mechanism will score better on average at all or almost all adoption rates among both adopters and non-adopters.
+We propose to generate an improved TCP congestion control mechanism using a genetic algorithm similar to the approach outlined by Winstein and Balakrishnan, with the special requirement that the algorithm must perform well \textit{at low adoption rates} for both adopters and non-adopters. 
 \subsection{Simulation Network}
 Any structured machine learning algorithm needs to be able to evaluate 
 the performance results of an action, and to evaluate performance an agent 
@@ -64,10 +64,14 @@ performance data for later analysis.
 \subsection{Congestion Control Neural Net and Genetic Algorithm}
 On page 2 of their paper, Winstein and Balakrishnan used a genetic algorithm to inform a neural network that affected the TCP ex Machina's congestion control properties, Their reasoning, as they say, was that ``the best way to approach this question is to take the design of specific algorithmic mechanisms out of the hands of human designers (no matter how sophisticated!), and make the end-to-end algorithm be a function of the desired overall behavior." We agree with their reasoning, and commend their eloquence.
 \section{Proposed Experiments}
-We will run our genetic algorithms For each generation, we will measure the performance of each candidate mechanism in the simulated network at several different adoption rates. The overall utility of the simulation will be a function of the utility of each user, which is itself a function of that user's throughput, latency, and reliability characteristics. Our genetic algorithm will use a fitness function based on total simulation utility at each adoption rate, with low adoption rates weighted more.
+Our experiment seeks to find a better performing flow control mechanism. We will define good performance by testing the mechanism on a simulated network, and measuring each end host's utility based on latency, throughput, and reliability; a good mechanism will score better on average at all or almost all adoption rates among both adopters and non-adopters. For each generation, we will measure the performance of each candidate mechanism in the simulated network at several different adoption rates. The overall utility of the simulation will be a function of the utility of each user, which is itself a function of that user's throughput, latency, and reliability characteristics. Our genetic algorithm will use a fitness function based on total simulation utility at each adoption rate, with low adoption rates weighted more.
 \subsection{Expected Results}
 We are hesitant to speculate as to what congestion control mechanisms will perform best, but as Winstein and Balakrishnan found, we expect to find significant room for improvement over current TCP standards, even at low adoption rates. The neural network that results from our work may be too difficult to comprehend, as was the case for Winstein and Balakrishnan. If we cannot hope to comprehend the solution, the chances are slim that we could accurately predict them. In the end, three posibilites exist: \begin{enumerate} \item no mechanism improves congestion control for all adoption levels. \item one mechanism strictly dominates all possibilities. \item several excel at different areas. \end{enumerate}
 \section{Schedule}
+\begin{enumerate} \item[Sun 3] Simulation testbed specification, test plan, API \item[Sun 10] Simulation Testbed 0.5, which can monitor a TCP connection between 2 end hosts through a router. \item[Sun 17] Finish Simulation Tesbed \item[Sun 24] AI 0.5 \item[Sun 1] AI finished \item[Sun 8] Data Collection finished \item[Wed 11] Report Finished \end{enumerate}
 \section{Citations}
+
+\bibliography{Sources}{}
+\bibliographystyle{plain}
 \end{document}
 
