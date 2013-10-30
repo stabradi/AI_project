@@ -5,9 +5,27 @@
 
 \begin{document}
 \maketitle
-\section{Introduction}
+\section{Abstract}
+	TCP's constant parameters don't have any research backing them up. While
+	better values for the constants have been found, they are not practical
+	to implement. Our research aims to find optimize the TCP parameters in 
+	such a way to maximize efficiency on systems that do not have full
+	adoption while not harming those who don't adopt. We expect to find
+	some values that may or may not be similar to the full adoption rate
+	values that achieve overall better performance values than the current
+	TCP parameters.
+\section{Background and Introduction}
+	Many of the constant parameters used in TCP seem arbirtrary and unfounded
+	in good	scientific research. For instance, the additive increase constant 
+	is one and the multiplicative deacrease is 1/2. These values were chosen 
+	because they were simple and not because they were the best. In the 
+	research "Deus ex TCP" by Winstein and Balakrishnan, they use genetic
+	algorithms to find the optimal values for all TCP parameters. While the
+	values they found worked better than current ones, they did not	explore
+	the case where only	some routers adopted optimized parameters and others 
+	did not. Unfortunately, the chances of their changes being adopted are
+	slim, as old routers would no longer be guarateed to function optimally.
 	
-\section{Background}
 	
 \section{Proposed Work}
 % Replace Winstein and Balakrishnan with special citation command
@@ -36,5 +54,6 @@
 	\subsection{Expected Results}
 		We are hesitant to speculate as to what congestion control algorithms will perform best, but as Winstein and Balakrishnan found, we expect to find significant room for improvement over current TCP standards, even at low adoption rates.
 \section{Schedule}
+		
 \section{Citations}
 \end{document}
