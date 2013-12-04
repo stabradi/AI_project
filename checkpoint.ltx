@@ -1,0 +1,36 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\author{Dolan Murvihill \and Mark Chaoui \and Sam Abradi}
+\title{Project Checkpointl: Performance tuning of TCP Congestion Control}
+\date{4 December 2013}
+%TODO replace paragraph indents with spacing
+\begin{document}
+\maketitle
+\section{Summary of Goals}
+Our project seeks to use an intelligent system to develop a more effective congestion control mechanism for the Transmission Control Protocol (TCP). In order to do this, we propose to utilize a neural net. The neural net will make a decision on whether or not to send each packet in the send queue, then we will use a utility function (defined in Progress section) to decide whether or not we should have send the packet. We shall continuously train our network with this data, having more recent data count for more (high learning rate). The final goal of this project is create an end host capable of near-optimally choosing whether or not to send a packet in the current state of the network. 
+We are using the Python-Based Reinforcement Learning, Artificial Intelligence and Neural Network Library (PyBrain) in order to handle the storage and training of the neural net. We utilize a tool that will simulate a wide-area network (WAN) with properties that resemble the Internet, Network Simulator (NS), which is the status quo for research of this type 
+
+\section{Progress To Date}
+At this point in time, we have a set up a neural net with PyBrain with three inputs and n outputs, where n is the max size of the send queue of the sender. The three inputs are the same as in [reference] and the outputs are a binary decision on whether or not it should have sent the packet at that point in the queue. We have implemented an algorithm that (for each connection) uses round trip time (RTT) over the minimum observed RTT to judge whether or not a packet should have been sent. We use this judgement as training data for the neural net.
+
+\section{Revised Project Plan}
+Originally, the project proposed to find the right mechanism to optimize a network with a well-known structure and the algorithm learns entirely supervised.  Each end host would run the same neural net, which would have been optimized for that network. The project has since changed to allow more flexibility in the algorithm to react to its setting. Now, each end host will develop its own neural net and continuously learn with new data. This is a far more realistic model is far more useful from a practical standpoint than our original model. The model would not only automatically adapt to a changing adoption rate, but also to the time of day. While the new model will be overall less optimal as it has no knowledge of what protocol other end hosts are using, the tradeoff in practicality is well worth it.
+
+\section{Revised Detailed Schedule}
+\begin {tabularx}
+\textwidth{X XXXXXX}
+Date and Milestone \\
+\hline
+8 Dec &- NS fully integrated; implemented completely to spec - detailed experimental procedure, including any applicable source code \\
+\hline
+9 Dec &- Data collection started \\
+\hline
+10 Dec &- Data collection finished \\
+\hline
+11 Dec &- Paper 1st draft finished, presentation started \\
+\hline
+12 Dec &- Paper and presentation finished \\
+\end {tabularx}
+
+\end{document}
