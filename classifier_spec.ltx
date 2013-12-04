@@ -1,0 +1,64 @@
+\documentclass{article}
+\title{TCP Worcester Reinforcement Learning Classifier Algorithm}
+\author{Dolan Murvihill}
+\date{\today}
+
+\usepackage{amsmath}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+\section{Design Criteria}
+\section{Input}
+The input to the TCPW Classifier is a TCPW \textit{state}, a corresponding
+TCPW \textit{action} which was taken in that state, and a sequence of
+\textit{events} which occurred as a result of that action. States are equivalent
+to the states used in Remy.
+A \textit{state} consists of:
+\begin{quote}
+  \begin{itemize}
+  \item An exponentially-weighted moving average (EWMA) of the interarrival time
+    between new acknowledgments received (\texttt{ack\_ewma})
+  \item An exponentially-weighted moving average of the time between TCP sender
+    timestamps reflected in those acknowledgments(\texttt{send\_ewma}). A weight
+    of 1/8 is given to the new sample in both EWMAs.
+  \item The ratio between the most recent RTT and the minimum RTT seen during
+    the current connection (\texttt{rtt\_ratio}).
+  \end{itemize}
+\end{quote} (From Winstein and Balakrishnan)
+
+An \textit{action} is either $nosend$ or a packet $P_i$ to send, chosen from
+the host's send queue.
+
+An \textit{event} is a list of chronologically ordered
+\textit{node transit reports},  and an \textit{end-to-end report}. Each node
+transit report is information about events that occurred while the packet was
+waiting in a buffer. It contains:
+\begin{itemize}
+  \item A list of packets dropped while $P_i$ was waiting in that buffer.
+  \item The amount of time the packet spent waiting for transit.
+\end{itemize}
+An end-to-end report is information about the overall status of the packet. It
+contains:
+\begin{itemize}
+  \item The total amount of time the packet spent in the network.
+  \item The number of hops the packet took.
+  \item The ultimate fate of the packet (chosen from \{\textit{received},
+    \textit{dropped}, \textit{corrupted}, \textit{refused}\}).
+\end{itemize}
+
+\section{Output}
+TCPW classifier returns a real value $U$, where $U$ represents the utility
+gained from performing the action under the given state.
+\section{Requirements}
+The utility from an action of $nosend$ is zero. The utility from
+an action of $P_i$ is based on the events that occurred while $P_i$ was in
+transit:
+\begin{itemize}
+  \item For successfully transiting the network and reaching the destination,
+    $U$ is set to $\alpha$.
+  \item For each packet that was dropped from a queue that $P_i$ was in, $U$ is
+    penalized by $\beta$.
+  \item If $P_i$ was dropped, $U$ is penalized by a value $\gamma$.
+\end{itemize}
+\end{document}

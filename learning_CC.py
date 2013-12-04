@@ -14,6 +14,13 @@ class Packet:
     def terminate_packet(self):
 
         
+class TcpwState:
+    def __init__(self, ack_ewma, send_ewma, rtt_ratio):
+        self.ack_ewma
+        self.send_ewma
+        self.rtt_ratio
+
+
 class ordered_recieve_buffer:
     def __init__(self):
         self.next_packet_number = 0
