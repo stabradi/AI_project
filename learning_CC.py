@@ -4,6 +4,13 @@ class Packet:
     def __init__(self,data,response_number):
         self.data = data
         self.response_number = response_number
+
+class TcpwState:
+    def __init__(self, ack_ewma, send_ewma, rtt_ratio):
+        self.ack_ewma
+        self.send_ewma
+        self.rtt_ratio
+
 class ordered_recieve_buffer:
     def __init__(self):
         self.next_packet_number = 0
