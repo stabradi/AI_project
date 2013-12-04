@@ -4,6 +4,16 @@ class Packet:
     def __init__(self,data,response_number):
         self.data = data
         self.response_number = response_number
+    # send_state is the state of the CC neural net at the time of sending
+    # given that there are three numbers that are taken as input by the neural net, this is going to 
+    def sent(self,ack_ewma,sent_ewma,rtt_ratio):
+        self.ack_ewma = ack_ewma
+        self.send_ewma = send_ewma
+        self.rtt_ratio = rtt_ratio
+    #state, action, event-sequence
+    def terminate_packet(self):
+
+        
 class ordered_recieve_buffer:
     def __init__(self):
         self.next_packet_number = 0
