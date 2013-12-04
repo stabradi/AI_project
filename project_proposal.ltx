@@ -1,5 +1,7 @@
 \documentclass{article}
+\usepackage{natbib}
 \usepackage{amsmath}
+\usepackage{tabularx}
 \author{Dolan Murvihill \and Mark Chaoui \and Sam Abradi}
 \title{Project Proposal: Performance tuning of TCP Congestion Control}
 \date{30 October 2013}
@@ -24,14 +26,14 @@ they were the best. Our project seeks to use an intelligent system to develop a 
 
 \section{Background}
 \subsection{TCP Congestion Control}
-RFC 5681 specifies a congestion control mechanism for TCP called additive-increase/multiplicative-decrease (AIMD) to avoid flooding networks with more traffic than they can carry. Sending more data through a link than it is able to handle causes packet loss, introducing significant amounts of waste traffic which will consume resources without improving end to end data throughput. The congestion control mechanism currently used in TCP is known as the sliding window. The sliding window keeps track of the number of packets sent-but-not-acknowleged, and only allows $n$ packets to be in this state. When a packet is successfully acknowleged, $n$ is increased by one (additive increase); conversely, when a packet is lost, requiring retransmission, $n$ is halved (multiplicative decrease). AIMD produces a traffic profile called a ``sawtooth", in which the send rate is always approaching the current available network capacity.
+RFC 5681 specifies a congestion control mechanism for TCP called additive-increase/multiplicative-decrease (AIMD) to avoid flooding networks with more traffic than they can carry. Sending more data through a link than it is able to handle causes packet loss, introducing significant amounts of waste traffic which will consume resources without improving end to end data throughput. The congestion control mechanism currently used in TCP is known as the sliding window. The sliding window keeps track of the number of packets sent-but-not-acknowledged, and only allows $n$ packets to be in this state. When a packet is successfully acknowledged, $n$ is increased by one (additive increase); conversely, when a packet is lost, requiring retransmission, $n$ is halved (multiplicative decrease). AIMD produces a traffic profile called a ``sawtooth", in which the send rate is always approaching the current available network capacity.
 
 \subsection{Genetic Algorithms}
-In brief, a genetic algorithm analyzes a number of candidates from a set of possible actions, selects the best, n as determined by some fitness function, ``breeds'' them by intermixing parts of two candidates and introducing mutation to avoid local minima, and then repeats for another trial. Our project aims to create a neural network by applying a genetic algorithm that uses a fitness function to judge the overall virtue of the control mechanism network as it applies to the network.
+In brief, a genetic algorithm analyzes a number of candidates from a set of possible actions, selects the best n as determined by some fitness function, ``breeds'' them by intermixing parts of two candidates and introducing mutation to avoid local minima, and then repeats for another trial. Our project aims to create a neural network by applying a genetic algorithm that uses a fitness function to judge the overall virtue of the control mechanism network as it applies to the network.
 
 \subsection{Related Work}
 TCP ex Machina is a suggested TCP congestion control mechanism created in 2013 by Keith 
-Winstein and Hari Balakrishnan, from MIT, with the help of a neural net informed by a
+Winstein and Hari Balakrishnan, from Massachusetts Institute of Technology, with the help of a neural net informed by a
 genetic algorithm. While their simulations found TCP ex Machina's network performance was
 better than current TCP congestion control, they only simulated performance in the case of full
 adoption. Since full adoption never happens immediately in real life, a mechanism that is only optimized for full adoption will not be adopted in the first place.
@@ -58,16 +60,35 @@ delay/reliability properties will be as similar as possible to the
 Internet. The simulation network will monitor and record network 
 performance data for later analysis.
 \subsection{Congestion Control Neural Net and Genetic Algorithm}
-On page 2 of their paper, Winstein and Balakrishnan used a genetic algorithm to inform a neural network that affected TCP ex Machina's congestion control properties, Their reasoning, as they say, was that ``the best way to approach this question is to take the design of specific algorithmic mechanisms out of the hands of human designers (no matter how sophisticated!), and make the end-to-end algorithm be a function of the desired overall behavior." We agree with their reasoning, and commend their eloquence.
+On page 2 of their paper, Winstein and Balakrishnan introduced a genetic algorithm to inform a neural network that affected TCP ex Machina's congestion control properties. Their reasoning, as they say, was that ``the best way to approach this question is to take the design of specific algorithmic mechanisms out of the hands of human designers (no matter how sophisticated!), and make the end-to-end algorithm be a function of the desired overall behavior." We agree with their reasoning, and commend their eloquence. We will use their methods and mindset to generate our own research, which will expand on their work, generalizing their solution to cases where only partial adoption of our mechanism exists. We will also use a genetic algorithm, though ours will have to account for varying degrees of adoption. This way, end hosts that use our mechanism can exist in harmony with those that do not.
 \section{Proposed Experiments}
-Each generation of our genetic algorithm will measure the performance of each candidate mechanism in the simulated network at several different adoption rates. We will define good performance as a function of each end host's utility, based on latency, throughput, and reliability; a good mechanism will score better on average at all or almost all adoption rates among both adopters and non-adopters. The overall utility of the simulation will be a function of the utility of each end host, which is itself a function of that user's throughput, latency, and reliability characteristics. Our genetic algorithm will use a fitness function based on total simulation utility at each adoption rate, with low adoption rates weighted more.
+Each generation of our genetic algorithm will measure the performance of each candidate mechanism in the simulated network at several different adoption rates. We will define good performance as a function of each end host's utility, based on latency, throughput, and reliability; a good mechanism will score better on average at all or almost all adoption rates among both adopters and non-adopters. Our genetic algorithm will use a fitness function based on total simulation utility at each adoption rate, with low adoption rates weighted more.
 \subsection{Expected Results}
-We are hesitant to speculate as to what congestion control mechanisms will perform best, but as Winstein and Balakrishnan found, we expect to find significant room for improvement over RFC 5681, even at low adoption rates. The neural network that results from our work may be too difficult to easily comprehend, as was the case for Winstein and Balakrishnan. If we cannot hope to comprehend the solution, the chances are slim that we could accurately predict them. In the end, three possibilites exist: \begin{enumerate} \item no mechanism improves congestion control for all adoption levels. \item one mechanism strictly dominates all possibilities. \item different mechanisms excel at different perfomance criteria. \end{enumerate}
+We are hesitant to speculate as to what congestion control mechanisms will perform best, but as Winstein and Balakrishnan found, we expect to find significant room for improvement over RFC 5681, even at low adoption rates. The neural network that results from our work may be too complex to easily comprehend, as was the case for Winstein and Balakrishnan. If we could predict the outcome, we wouldn't need the algorithm. In the end, three possibilites exist: \begin{enumerate} \item no mechanism improves congestion control at all adoption levels. \item one mechanism strictly dominates all possibilities. \item different mechanisms excel at different perfomance criteria. \end{enumerate}
 \section{Schedule}
-\begin{enumerate} \item[Sun 3] Simulation testbed specification, test plan, API \item[Sun 10] Simulation Testbed 0.5, which can monitor a TCP connection between 2 end hosts through a router. \item[Sun 17] Finish Simulation Tesbed \item[Sun 24] AI 0.5 \item[Sun 1] AI finished \item[Sun 8] Data Collection finished \item[Wed 11] Report Finished \end{enumerate}
-\section{Citations}
+\begin{tabularx}
+\textwidth{X XXXXXX}
+Date & Milestone \\
+\hline
+3 Nov & - Simulation testbed specification, test plan, API reference, and detailed implementation schedule \\
+\hline
+10 Nov & - Simulation testbed 0.5; testbed can monitor a TCP connection between two end hosts through a router \\
+\hline
+17 Nov & - Simulation testbed 1.0; implemented completely to spec \newline - specification, test plan, API reference, and detailed implementation schedule for AI component \\
+\hline
+24 Nov & - AI component 0.5; fully working neural network informs host performance, responds correctly to API calls from toy genetic algorithm \\
+\hline
+1 Dec & - AI component 1.0; implemented completely to spec \newline - detailed experimental procedure, including any applicable source code \\
+\hline
+8 Dec & - Data collection finished \\
+\hline
+12 Dec & - Paper and presentation finished \\
+\end{tabularx}
+\section{Further Reading}
+ \hangindent=0.7cm Keith Winstein and Hari Balakrishnan. 2013. TCP ex machina: computer-generated congestion control. In \textit {Proceedings of the ACM SIGCOMM 2013 conference on SIGCOMM} (SIGCOMM '13). ACM, New York, NY, USA, 123-134. DOI=10.1145/2486001.2486020 http://doi.acm.org/10.1145/2486001.2486020 \newline
+\flushleft \hangindent=0.7cm M. Allman, V. Paxman, and E. Blanton. \textit{TCP Congestion Control}. IETF, RFC 5681. September 2009 available: http://tools.ietf.org/html/rfc5681
 
-\bibliography{Sources}{}
+\bibliography{Sources}
 \bibliographystyle{plain}
 \end{document}
 
