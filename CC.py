@@ -1,5 +1,6 @@
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.supervised.trainers import BackpropTrainer
+from pybrain.datasets import SupervisedDataSet
 import sys
 import getopt
 import pipes
@@ -14,9 +15,9 @@ class Classifier:
         self.beta = beta #penalty for having other packets drop around you
         self.gamma = gamma #penalty for being dropped
         self.net = buildNetwork(3, hidden_neurons, max_send_queue)
-        self.data_set = SupervisedDataset(3, max_send_queue)
+        self.data_set = SupervisedDataSet(3, max_send_queue)
     
-    def computeUtility(packet_ack_log):
+    def computeUtility(self, packet_ack_log):
         #initialize utility
         utility = []
         for ii in range(len(packet_ack_log)):
@@ -30,27 +31,27 @@ class Classifier:
                 utility[ii] += self.alpha
         return utility
 
-    def addToTrainingSet(state, lineOfFire):
+    def addToTrainingSet(self, state, lineOfFire):
         self.data_set.addSample(state, lineOfFire)
 
-    def trainNet():
+    def trainNet(self):
         trainer = BackpropTrainer(self.net, self.data_set)
         trainer.trainUntilConvergence()
 
-    def computeAndTrain(packet_ack_log):
-        utility = computeUtility(packet_ack_log)
+    def computeAndTrain(self, packet_ack_log):
+        utility = self.computeUtility(packet_ack_log)
         #whether we should have fired the packet or not. 1 means we should have
         #0 means we should not have
         lineOfFire = []
-        for i in range(utility):
+        for i in range(len(utility)):
             lineOfFire.append(0)
             #if we gained utility from the packet, we should have sent it.
             if utility[i] > 0:
                 lineOfFire[i] = 1
-            add
-        trainNet();
+            self.addToTrainingSet(packet_ack_log[i][2], lineOfFire[i])
+        self.trainNet();
 
-    def getNet():
+    def getNet(self):
         return self.net
 
 class NCC:
