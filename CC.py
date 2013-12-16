@@ -64,6 +64,7 @@ class NCC:
         self.number_of_packets_to_send = 0
         self.next_unsent = 0
         self.packet_ack_log = {}
+        self.last_ack_in_seq = -1
         self.ticks = 0
     def enqueue(self,packet):
         self.packets_in_flight.append(packet)
@@ -75,8 +76,11 @@ class NCC:
             if p > response_number:
                 next_queue_batch.append(p)
             else:                          # this means it was taken out of the queue, better log at what time it was taken out of the queue
-                self.packet_ack_log[response_number][1] = self.ticks # this is gonna log things when the packet is acked, eventuall it will also adjust those weighted things
+                for i in range(self.last_ack_in_seq,response_number):
+                    self.packet_ack_log[i+1][1] = self.ticks # this is gonna log things when the packet is acked, eventuall it will also adjust those weighted things
             
+        if self.last_ack_in_seq < response_number:
+            self.last_ack_in_seq = response_number
         self.packets_in_flight = next_queue_batch
         #foo[:n-1] + foo[n:] + [None]
     def send_n_packets(self,n):
@@ -87,11 +91,20 @@ class NCC:
         i = 0
         for s in sends:
             if s > 0: # I guess we can play around with this number if we want, I am not sure if that is a good idea
-                self.enqueue(self.next_unsent + i)
+        #        self.enqueue(self.next_unsent + i)
                 SQ.append(self.next_unsent + i)
             i += 1
-        self.next_unsent += i
+        if SQ == []:
+            return []
+        SQ_x = SQ[-1]
+        if (SQ_x - self.next_unsent) > self.number_of_packets_to_send:
+            SQ_x = self.next_unsent + self.number_of_packets_to_send
+        SQ = range(self.next_unsent, SQ_x)
+        self.next_unsent = SQ_x
         print SQ
+        for s in SQ:
+            self.enqueue(s)
+            self.number_of_packets_to_send -= 1
         return SQ # this should be an array of sequence numbers or something
     def tick(self):
         self.ticks += 1
