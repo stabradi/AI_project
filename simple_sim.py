@@ -30,18 +30,34 @@ class sending_agent:
         self.handle_input(self.link.recv(self.addr))
         self.link.send(self.generate_packets())
     def handle_input(self,incoming_packets):
-        print('')
+        for p in incoming_packets:
+            self.cc.handle_ack(p)
     def generate_packets(self):
-        self.handle_input(self.link.recv())
-        self.link.send(self.generate_packets())
+        return self.cc.get_pending_sends()
 
 class recving_agent:
     def __init__(self,link,addr):
         self.link = link
         self.addr = addr
+        self.last_in_order_seq = -1
+        self.out_of_order_seqs = []
+        self.sndQ = []
     def tick(self):
         self.handle_input(self.link.recv())
         self.link.send(self.generate_packets())
+    def handle_input(self,input_list):
+        while input_list != [] or self.out_of_order_seqs != []:
+            if self.last_in_order_seq+1 in input_list:
+                self.last_in_order_seq += 1
+                input_list.remove(self.last_in_order_seq)
+            elif self.last_in_order_seq+1 in self.out_of_order_seqs:
+                self.last_in_order_seq += 1
+                self.out_of_order_seqs.remove(self.last_in_order_seq)
+            else:
+                self.out_of_order_seqs += input_list
+                return
+    def generate_packets(self):
+        return [self.last_in_order_seq]
 
 def main(argv=None):
     if argv==None:

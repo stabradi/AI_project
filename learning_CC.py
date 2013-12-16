@@ -1,4 +1,7 @@
 from pybrain.tools.shortcuts import buildNetwork
+import sys
+import getopt
+import pipes
 
 class Packet:
     def __init__(self,data,response_number):
@@ -12,7 +15,7 @@ class Packet:
         self.rtt_ratio = rtt_ratio
     #state, action, event-sequence
     def terminate_packet(self):
-
+        print('this hasnt been done')
         
 class TcpwState:
     def __init__(self, ack_ewma, send_ewma, rtt_ratio):
@@ -55,7 +58,20 @@ class NCC:
             self.add_response()
     def handle_ack(self, response_number):
         #foo[:n-1] + foo[n:] + [None]
-        response_position = 
+        response_position = 5 # I have no idea what is happening
         for i in range(len(self.send_queue)):
-            
-        self.send_queue = 
+            print('something went here, but clearly it was not committed')
+        self.send_queue = 5 # I have no idea what is happening
+
+
+def main(argv=None):
+    if argv=None:
+        argv = sys.argv
+    input_file = argv[1] #first arg is the name of the input pipe
+    output_file = argv[2] #second arg is the name of the output pipe
+    OF = pipes.Template().open(output_file,'w')
+    IF = open(input_file)
+
+
+if __name__ == "__main__":
+    main()

@@ -67,7 +67,7 @@ class NCC:
         self.ticks = 0
     def enqueue(self,packet):
         self.packets_in_flight.append(packet)
-        self.packet_ack_log[packet] = (self.ticks,0,None) 
+        self.packet_ack_log[packet] = [self.ticks,0,None]
         #(time created, time acked, input to NN
     def handle_ack(self, response_number): # this should return some packets to transmit probably                                                                              
         next_queue_batch = []
