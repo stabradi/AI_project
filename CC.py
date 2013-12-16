@@ -1,8 +1,57 @@
 from pybrain.tools.shortcuts import buildNetwork
+from pybrain.supervised.trainers import BackpropTrainer
 import sys
 import getopt
 import pipes
 
+
+class Classifier:
+
+    #I'm not sure where to get the number of packets dropped while the packet in
+    #question was in queue
+    def __init__(self, alpha, beta, gamma, hidden_neurons, max_send_queue):
+        self.alpha = alpha #prize for being successfully acked
+        self.beta = beta #penalty for having other packets drop around you
+        self.gamma = gamma #penalty for being dropped
+        self.net = buildNetwork(3, hidden_neurons, max_send_queue)
+        self.data_set = SupervisedDataset(3, max_send_queue)
+    
+    def computeUtility(packet_ack_log):
+        #initialize utility
+        utility = []
+        for ii in range(len(packet_ack_log)):
+            utility.append(0)
+            #When the time sent is greater than the time recieved, that means
+            #the packet was never recieved. Apply packet dropped penalty.
+            if packet_ack_log[ii][0] > packet_ack_log[ii][1]:
+                utility[ii] -= self.gamma
+            #Else the packet must have made it! Give the NN a cookie.
+            else:
+                utility[ii] += self.alpha
+        return utility
+
+    def addToTrainingSet(state, lineOfFire):
+        self.data_set.addSample(state, lineOfFire)
+
+    def trainNet():
+        trainer = BackpropTrainer(self.net, self.data_set)
+        trainer.trainUntilConvergence()
+
+    def computeAndTrain(packet_ack_log):
+        utility = computeUtility(packet_ack_log)
+        #whether we should have fired the packet or not. 1 means we should have
+        #0 means we should not have
+        lineOfFire = []
+        for i in range(utility):
+            lineOfFire.append(0)
+            #if we gained utility from the packet, we should have sent it.
+            if utility[i] > 0:
+                lineOfFire[i] = 1
+            add
+        trainNet();
+
+    def getNet():
+        return self.net
 
 class NCC:
     def __init__(self, hidden_neurons, max_send_queue):
@@ -17,7 +66,8 @@ class NCC:
         self.ticks = 0
     def enqueue(self,packet):
         self.packets_in_flight.append(packet)
-        self.packet_ack_log[packet] = (self.ticks,0,None)
+        self.packet_ack_log[packet] = (self.ticks,0,None) 
+        #(time created, time acked, input to NN
     def handle_ack(self, response_number): # this should return some packets to transmit probably                                                                              
         next_queue_batch = []
         for p in self.packets_in_flight:
