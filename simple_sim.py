@@ -1,6 +1,17 @@
 import CC
 import sys
 
+# this takes two links, and handles the main link between them, along with the main send queues
+class Master_link:
+    def __init__(self,sending_link,recving_link):
+        self.sending_link = sending_link
+        self.recving_link = recving_link
+        self.global_send_queue = []
+        self.
+    def tick(self):
+        for k in self.sending_link.addr_buffer_pairs:
+            self.recving_link.send(k,self.sending_link.recv(10000,k))
+
 class Link:
     # takes a dict of link address pairs
     def __init__(self,addr_link_pairs,queue_length):
@@ -25,7 +36,10 @@ class sending_agent:
     def __init__(self,link,cc,addr):
         self.link = link
         self.cc = cc
-        self.addr = addr
+        self.host_addr = addr
+        self.goal_addr = 0-addr # this is because sending agents are never addressing other sending agents
+        self.bandwidth = 3 # default bandwidth
+        self.mission = 45 # default number of packets to be sent 
     def tick(self):
         self.handle_input(self.link.recv(self.addr))
         self.link.send(self.generate_packets())
@@ -38,7 +52,8 @@ class sending_agent:
 class recving_agent:
     def __init__(self,link,addr):
         self.link = link
-        self.addr = addr
+        self.addr_host = addr
+        self.goal_addr = 0-addr
         self.last_in_order_seq = -1
         self.out_of_order_seqs = []
         self.sndQ = []
