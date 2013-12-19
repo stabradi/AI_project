@@ -1,6 +1,9 @@
 import CC
 import sys
 
+# keeps track of the origin time of packets. Index with (origin addr, seq. no)
+otime = {}
+
 # this takes two links, and handles the main link between them, along with the main send queues
 # think of it as the line between the two routers in the dumbell
 class Master_link:
@@ -55,8 +58,8 @@ class Link:
         ret = self.addr_buffer_pairs[recving_addr][:number_of_packets]
         # Trigger listeners
         for pkt in self.addr_buffer_pairs[recving_addr]:
-            for routine in send_events:
-                routine(time,self,recving_addr,pkt)
+            for routine in self.send_events:
+                routine(global_time,self,recving_addr,pkt)
         #clear the sent packets from the buffer
         self.addr_buffer_pairs[recving_addr] = self.addr_buffer_pairs[recving_addr][number_of_packets:]
         return ret
@@ -79,8 +82,8 @@ class Link:
             # Notify listners of any dropped packets
             drops = bpairs[0][self.queue_length:]
             for pkt in drops:
-                for routine in drop_events:
-                    routine(self,pkt,0-addr,addr)
+                for routine in self.drop_events:
+                    routine(global_time,self,pkt,0-addr,addr)
             # Drop the packets
             bpairs[0] = bpairs[0][:self.queue_length]
         # Some traffic is "through" traffic.
@@ -89,13 +92,13 @@ class Link:
             bpairs[addr] = bpairs[addr][:self.queue_length]
 
     # Call these to register listeners with the link
-    def on_send(routine):
+    def on_send(self, routine):
         self.send_events.append(routine)
-    def on_recv(routine):
+    def on_recv(self, routine):
         self.recv_events.append(routine)
-    def on_enQ(routine):
+    def on_enQ(self, routine):
         self.recv_events.append(routine)
-    def on_drop(routine):
+    def on_drop(self, routine):
         self.drop_events.append(routine)
 
 class sending_agent:
@@ -123,13 +126,19 @@ class sending_agent:
     # We only ever receive ACKs; our CC figures out when to retransmit based
     # on the ACKs we receive.
     def handle_input(self,incoming_packets):
+        # call listeners
         for p in incoming_packets:
+            for routine in self.success_events:
+                routine(global_time,self,dst,p,otime[(self.host_addr,p)])
             self.cc.handle_ack(p)
 
     def generate_packets(self):
-        return self.cc.get_pending_sends()
+        rtn = self.cc.get_pending_sends()
+        for pkt in rtn:
+            otime[(self.host_addr, pkt)] = global_time
+        return rtn
 
-    def on_success(routine):
+    def on_success(self, routine):
         self.success.append(routine)
 
 class recving_agent:
@@ -183,14 +192,14 @@ class Oracle:
         agt.on_success(self.success)
     
     # Start logging events
-    def begin_log(f):
+    def begin_log(self,f):
         self.logfiles.append(f)
 
-    def flush_logs():
-        for event in events[logloc:]:
-            for f in logfiles:
-                f.write(event.logstr)
-        logloc = len(events)
+    def flush_logs(self):
+        for event in self.events[self.logloc:]:
+            for f in self.logfiles:
+                f.write("Writing an event to a file!\n")
+        self.logloc = len(self.events)
 
     def drop(self, time, obj, seqno, src, dst):
         self.events.append(DropEvent(time, obj, seqno, src, dst))
@@ -253,7 +262,7 @@ def main(argv=None):
     # command line or input file
     hidden_neurons = 7 
     max_send_queue = 5
-    logout = "ssim.trc"
+    logfilename = "ssim.trc"
     oracle = Oracle()
     oracle.reg_link(sending_link)
     oracle.reg_link(recving_link)
@@ -265,11 +274,10 @@ def main(argv=None):
         sending_link.register(i,snd_agt)
         recving_link.register(0-i,rcv_agt)
         oracle.reg_agt(snd_agt)
-        oracle.reg_agt(rcv_agt)
     try:
         logout = open(logfilename,'w')
         oracle.begin_log(logout)
-    except IOException as e:
+    except IOError as e:
         print "Failed to open log."
     net = Master_link(sending_link,recving_link)
     net.tock()
