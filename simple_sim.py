@@ -2,7 +2,7 @@ import CC
 import sys
 
 # this takes two links, and handles the main link between them, along with the main send queues
-# think of it as the line between the two routers in the dumbel
+# think of it as the line between the two routers in the dumbell
 class Master_link:
     def __init__(self,sending_link,recving_link):
         sending_link.register(0,self)
@@ -47,11 +47,17 @@ class Link:
         for key in self.addr_link_pairs:
             self.addr_link_pairs[key].tick()
 
-    # Return the first x bytes from the buffer for address y, then clear that
-    # many bytes. The caller knows how much data its link allows, so it requests
+    # Return the first x packets from the buffer for address y, then clear that
+    # x packets. The caller knows how much data its link allows, so it requests
     # that much data per tick.
     def recv(self,number_of_packets,recving_addr): 
+        # get the first x packets
         ret = self.addr_buffer_pairs[recving_addr][:number_of_packets]
+        # Trigger listeners
+        for pkt in self.addr_buffer_pairs[recving_addr]:
+            for routine in send_events:
+                routine(time,self,recving_addr,pkt)
+        #clear the sent packets from the buffer
         self.addr_buffer_pairs[recving_addr] = self.addr_buffer_pairs[recving_addr][number_of_packets:]
         return ret
 
@@ -65,26 +71,30 @@ class Link:
               + ' ' + str(self.agent_side) \
               + ' ' + str(addr))
 
-        if self.agent_side and (addr < 0): 
+        # If agent_side is true, we are on the sender's end and want to
+        # transmit to negative addresses. If it is false, we are on the
+        # receiver's end and want to transmit to positive addresses.
+        if (self.agent_side == (addr < 0)) and addr != 0: 
             bpairs[0] += [(addr, [p]) for p in packets]
+            # Notify listners of any dropped packets
+            drops = bpairs[0][self.queue_length:]
+            for pkt in drops:
+                for routine in drop_events:
+                    routine(self,pkt,0-addr,addr)
+            # Drop the packets
             bpairs[0] = bpairs[0][:self.queue_length]
-            return
-        elif (not self.agent_side) and (addr > 0): 
-                    bpairs[0] += [(addr, [p]) for p in packets]
-                    bpairs[0] = bpairs[0][:self.queue_length]
-                    return
-        bpairs[addr] += packets
-        bpairs[addr] = bpairs[addr][:self.queue_length]
+        # Some traffic is "through" traffic.
+        else:
+            bpairs[addr] += packets
+            bpairs[addr] = bpairs[addr][:self.queue_length]
 
+    # Call these to register listeners with the link
     def on_send(routine):
         self.send_events.append(routine)
-
     def on_recv(routine):
         self.recv_events.append(routine)
-
     def on_enQ(routine):
         self.recv_events.append(routine)
-
     def on_drop(routine):
         self.drop_events.append(routine)
 
@@ -107,6 +117,7 @@ class sending_agent:
 
     def tick(self):
         self.handle_input(self.link.recv(self.bandwidth,self.host_addr))
+        packets = self.generate_packets()
         self.link.send(self.goal_addr,self.generate_packets())
 
     # We only ever receive ACKs; our CC figures out when to retransmit based
@@ -157,6 +168,8 @@ class recving_agent:
 class Oracle:
     def __init__(self):
         self.events = []
+        self.logfiles = []
+        self.logloc = 0
     
     # Start listening for events on a link
     def reg_link(self, link):
@@ -169,6 +182,16 @@ class Oracle:
     def reg_agt(self, agt):
         agt.on_success(self.success)
     
+    # Start logging events
+    def begin_log(f):
+        self.logfiles.append(f)
+
+    def flush_logs():
+        for event in events[logloc:]:
+            for f in logfiles:
+                f.write(event.logstr)
+        logloc = len(events)
+
     def drop(self, time, obj, seqno, src, dst):
         self.events.append(DropEvent(time, obj, seqno, src, dst))
         print "Drop!"
@@ -178,6 +201,7 @@ class Oracle:
     
     def success(self, time, src, dst, seqno, sent):
         self.events.append(TransmitSuccessEvent(time,src,seqno,dst,sent))
+        print "Success"
 
     def send(self, time, src, dst, seqno):
         self.events.append(SendEvent(time, src, seqno, dst))
@@ -229,13 +253,32 @@ def main(argv=None):
     # command line or input file
     hidden_neurons = 7 
     max_send_queue = 5
+    logout = "ssim.trc"
+    oracle = Oracle()
+    oracle.reg_link(sending_link)
+    oracle.reg_link(recving_link)
     for i in range(1,5):
-        sending_link.register(i,sending_agent(sending_link,CC.NCC(hidden_neurons,max_send_queue),i))
-        recving_link.register(0-i,recving_agent(recving_link,0-i))
+        snd_agt = sending_agent(sending_link,
+                                CC.NCC(hidden_neurons,max_send_queue),
+                                i)
+        rcv_agt = recving_agent(recving_link,0-i)
+        sending_link.register(i,snd_agt)
+        recving_link.register(0-i,rcv_agt)
+        oracle.reg_agt(snd_agt)
+        oracle.reg_agt(rcv_agt)
+    try:
+        logout = open(logfilename,'w')
+        oracle.begin_log(logout)
+    except IOException as e:
+        print "Failed to open log."
     net = Master_link(sending_link,recving_link)
     net.tock()
+    oracle.flush_logs()
     net.tock()
+    oracle.flush_logs()
     net.tock()
+    oracle.flush_logs()
+    logout.close()
 
 
 if __name__ == "__main__":
