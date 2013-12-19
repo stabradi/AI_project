@@ -1,6 +1,8 @@
 import CC
 import sys
 
+# this is the global time, it goes up every tick, it is global
+global_time = 0
 # keeps track of the origin time of packets. Index with (origin addr, seq. no)
 otime = {}
 
@@ -24,6 +26,7 @@ class Master_link:
     def tock(self):
         self.sending_link.tick()
         self.recving_link.tick()
+        global_time += 1                             # this is where the global time goes up
 
 class Link:
     # TODO P2 call listeners when send, receive, enqueue, or drop events occur
