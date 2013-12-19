@@ -2,19 +2,23 @@ import CC
 import sys
 
 # this takes two links, and handles the main link between them, along with the main send queues
+# think of it as the line between the two routers in the dumbel
 class Master_link:
     def __init__(self,sending_link,recving_link):
         self.sending_link = sending_link
         self.recving_link = recving_link
-        self.global_send_queue = []
-        self.
     def tick(self):
-        for k in self.sending_link.addr_buffer_pairs:
-            self.recving_link.send(k,self.sending_link.recv(10000,k))
+        send_packets = self.sending_link.recv(100,0) # get up to 100 packets, they are cross network packets, so they have an addr of 0
+        recv_packets = self.recving_link.recv(100,0)
+        for p in send_packets:
+            self.sending_link.send(p[0],p[1])
+        for p in recv_packets:
+            self.recving_link.send(p[0],p[1])
 
 class Link:
     # takes a dict of link address pairs
-    def __init__(self,addr_link_pairs,queue_length):
+    def __init__(self,addr_link_pairs,queue_length,agent_side):
+        self.agent_side = agent_side # this is a boolean flag that determines if the link is connected to the sending agents or not for purposes of addressing
         self.addr_link_pairs = addr_link_pairs
         self.addr_buffer_pairs = {}
         for key in addr_link_pairs:
@@ -29,6 +33,10 @@ class Link:
         self.addr_buffer_pairs[recving_addr] = self.addr_buffer_pairs[recving_addr][number_of_packets:]
         return ret
     def send(self,addr,packets):
+        # this is how you denote if the link is on the side of the sender or the reciever, it creates something like (real_addr, [packet, packet, ...])
+        if self.agent_side and addr < 0: 
+                    self.addr_buffer_pairs[0] += [(addr, p) for p in packets]
+                    self.addr_buffer_pairs[0] = self.addr_buffer_pairs[0][:self.queue_length]
         self.addr_buffer_pairs[addr] += packets
         self.addr_buffer_pairs[addr] = self.addr_buffer_pairs[addr][:self.queue_length]
 
@@ -41,7 +49,7 @@ class sending_agent:
         self.bandwidth = 3 # default bandwidth
         self.mission = 45 # default number of packets to be sent 
     def tick(self):
-        self.handle_input(self.link.recv(self.addr))
+        self.handle_input(self.link.recv(self.bandwidth,self.addr))
         self.link.send(self.generate_packets())
     def handle_input(self,incoming_packets):
         for p in incoming_packets:
