@@ -43,9 +43,16 @@ class Link:
     def send(self,addr,packets):
         # this is how you denote if the link is on the side of the sender or the reciever, it creates something like (real_addr, [packet, packet, ...])
         # true agent_side means that positive addresses are on this side of the net
-        if self.agent_side and addr < 0: 
+        print(str(self.addr_buffer_pairs)+ ' ' + str(self.agent_side) + ' ' + str(addr))
+        
+        if self.agent_side and (addr < 0): 
                     self.addr_buffer_pairs[0] += [(addr, p) for p in packets]
                     self.addr_buffer_pairs[0] = self.addr_buffer_pairs[0][:self.queue_length]
+                    return
+        elif (not self.agent_side) and (addr > 0): 
+                    self.addr_buffer_pairs[0] += [(addr, p) for p in packets]
+                    self.addr_buffer_pairs[0] = self.addr_buffer_pairs[0][:self.queue_length]
+                    return
         self.addr_buffer_pairs[addr] += packets
         self.addr_buffer_pairs[addr] = self.addr_buffer_pairs[addr][:self.queue_length]
 
@@ -74,9 +81,10 @@ class recving_agent:
         self.last_in_order_seq = -1
         self.out_of_order_seqs = []
         self.sndQ = []
+        self.bandwidth = 3 # default bandwidth
     def tick(self):
-        self.handle_input(self.link.recv())
-        self.link.send(self.generate_packets())
+        self.handle_input(self.link.recv(self.bandwidth,self.addr_host))
+        self.link.send(self.goal_addr,self.generate_packets())
     def handle_input(self,input_list):
         while input_list != [] or self.out_of_order_seqs != []:
             if self.last_in_order_seq+1 in input_list:
