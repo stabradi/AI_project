@@ -54,37 +54,50 @@ class Classifier:
     def getNet(self):
         return self.net
 
+# An individual congestion control algorithm, expressed as a neural network.
 class NCC:
     def __init__(self, hidden_neurons, max_send_queue):
         self.net = buildNetwork(3, hidden_neurons, max_send_queue)
         self.packets_in_flight = []
-        self.ack_ewma = 1
-        self.send_ewma = 1
-        self.rtt_ratio = 1
+
+        # We use these three parameters to decide when to send packets.
+        # (note, EWMA stands for exponentially weighted moving average)
+        self.ack_ewma = 1 # EWMA of interval acknowledgments
+        self.send_ewma = 1 # EWMA of interval between sends (based on ACKs)
+        self.rtt_ratio = 1 # Latest RTT divided by minimum observed RTT
+
         self.number_of_packets_to_send = 0
         self.next_unsent = 0
         self.packet_ack_log = {}
         self.last_ack_in_seq = -1
         self.ticks = 0
+
     def enqueue(self,packet):
         self.packets_in_flight.append(packet)
         self.packet_ack_log[packet] = [self.ticks,0,None]
-        #(time created, time acked, input to NN
-    def handle_ack(self, response_number): # this should return some packets to transmit probably                                                                              
+        #(time created, time acked, input to NN)
+
+    # this should return some packets to transmit probably (should it? Are we
+    # planning to deprecate get_pending_sends? -DM)
+    def handle_ack(self, response_number): 
         next_queue_batch = []
         for p in self.packets_in_flight:
             if p > response_number:
                 next_queue_batch.append(p)
             else:                          # this means it was taken out of the queue, better log at what time it was taken out of the queue
                 for i in range(self.last_ack_in_seq,response_number):
-                    self.packet_ack_log[i+1][1] = self.ticks # this is gonna log things when the packet is acked, eventuall it will also adjust those weighted things
-            
-        if self.last_ack_in_seq < response_number:
-            self.last_ack_in_seq = response_number
-        self.packets_in_flight = next_queue_batch
+                    # Log time of packet ACK
+                    # TODO P2 Modify EWMAs and RTT ratio
+                    self.packet_ack_log[i+1][1] = self.ticks
+                    
+                if self.last_ack_in_seq < response_number:
+                    self.last_ack_in_seq = response_number
+                    self.packets_in_flight = next_queue_batch
         #foo[:n-1] + foo[n:] + [None]
+                        
     def send_n_packets(self,n):
         self.number_of_packets_to_send += n
+
     def get_pending_sends(self):
         sends = self.net.activate([self.ack_ewma, self.send_ewma, self.rtt_ratio])
         SQ = []
@@ -106,6 +119,7 @@ class NCC:
             self.enqueue(s)
             self.number_of_packets_to_send -= 1
         return SQ # this should be an array of sequence numbers or something
+
     def tick(self):
         self.ticks += 1
 

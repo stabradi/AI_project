@@ -31,47 +31,68 @@ class Link:
 #        for key in self.addr_link_pairs:
 #            self.addr_buffer_pairs[key] = []
         self.queue_length = queue_length
+
     def register(self,addr,link):
         self.addr_link_pairs[addr] = link
         self.addr_buffer_pairs[addr] = []
+
     def tick(self):
         for key in self.addr_link_pairs:
             self.addr_link_pairs[key].tick()
-    # the thing calling recv knows how much data its link allows, so it requests that much data per tick
+
+    # Return the first x bytes from the buffer for address y, then clear that
+    # many bytes. The caller knows how much data its link allows, so it requests
+    # that much data per tick.
     def recv(self,number_of_packets,recving_addr): 
         ret = self.addr_buffer_pairs[recving_addr][:number_of_packets]
         self.addr_buffer_pairs[recving_addr] = self.addr_buffer_pairs[recving_addr][number_of_packets:]
         return ret
+
     def send(self,addr,packets):
-        # this is how you denote if the link is on the side of the sender or the reciever, it creates something like (real_addr, [packet, packet, ...])
+        bpairs = self.addr_buffer_pairs # temporary variable
+        # this is how you denote whether the link is on the side of the sender
+        # or the reciever, it creates something like
+        # (real_addr, [packet, packet, ...])
         # true agent_side means that positive addresses are on this side of the net
-        print(str(self.addr_buffer_pairs)+ ' ' + str(self.agent_side) + ' ' + str(addr))
-        
+        print(str(bpairs) \
+              + ' ' + str(self.agent_side) \
+              + ' ' + str(addr))
+
         if self.agent_side and (addr < 0): 
-                    self.addr_buffer_pairs[0] += [(addr, [p]) for p in packets]
-                    self.addr_buffer_pairs[0] = self.addr_buffer_pairs[0][:self.queue_length]
-                    return
+            bpairs[0] += [(addr, [p]) for p in packets]
+            bpairs[0] = bpairs[0][:self.queue_length]
+            return
         elif (not self.agent_side) and (addr > 0): 
-                    self.addr_buffer_pairs[0] += [(addr, [p]) for p in packets]
-                    self.addr_buffer_pairs[0] = self.addr_buffer_pairs[0][:self.queue_length]
+                    bpairs[0] += [(addr, [p]) for p in packets]
+                    bpairs[0] = bpairs[0][:self.queue_length]
                     return
-        self.addr_buffer_pairs[addr] += packets
-        self.addr_buffer_pairs[addr] = self.addr_buffer_pairs[addr][:self.queue_length]
+        bpairs[addr] += packets
+        bpairs[addr] = bpairs[addr][:self.queue_length]
 
 class sending_agent:
     def __init__(self,link,cc,addr):
         self.link = link
-        self.cc = cc
+        self.cc = cc # The congestion control algorithm to use
         self.host_addr = addr
-        self.goal_addr = 0-addr # this is because sending agents are never addressing other sending agents
+        # This is a bit of a hack; we treat adresses as signed integers, and
+        # each agent communicates with the agent whose address is opposite; the
+        # upshot is that no agent can have more than one connection open, which
+        # works fine for our purposes.
+        self.goal_addr = 0-addr
+
         self.bandwidth = 3 # default bandwidth
         self.mission = 45 # default number of packets to be sent 
+
     def tick(self):
         self.handle_input(self.link.recv(self.bandwidth,self.host_addr))
         self.link.send(self.goal_addr,self.generate_packets())
+
+    # We only ever receive ACKs; our CC figures out when to retransmit based
+    # on the ACKs we receive.
     def handle_input(self,incoming_packets):
         for p in incoming_packets:
             self.cc.handle_ack(p)
+
     def generate_packets(self):
         return self.cc.get_pending_sends()
 
@@ -79,15 +100,18 @@ class recving_agent:
     def __init__(self,link,addr):
         self.link = link
         self.addr_host = addr
-        self.goal_addr = 0-addr
-        self.last_in_order_seq = -1
+        self.goal_addr = 0-addr # see sending_agent.goal_addr for an explanation
+        self.last_in_order_seq = -1 # -1 means we have received no packets yet.
         self.out_of_order_seqs = []
         self.sndQ = []
         self.bandwidth = 3 # default bandwidth
+
     def tick(self):
         self.handle_input(self.link.recv(self.bandwidth,self.addr_host))
         self.link.send(self.goal_addr,self.generate_packets())
+
     def handle_input(self,input_list):
+        # TODO P3 write a helper function to encapsulate some of this logic
         while input_list != [] or self.out_of_order_seqs != []:
             if self.last_in_order_seq+1 in input_list:
                 self.last_in_order_seq += 1
@@ -98,7 +122,9 @@ class recving_agent:
             else:
                 self.out_of_order_seqs += input_list
                 return
+
     def generate_packets(self):
+        # ACK the last in-order packet
         return [self.last_in_order_seq]
 
 def main(argv=None):
@@ -106,7 +132,9 @@ def main(argv=None):
         argv = sys.argv
     sending_link = Link(8,True)
     recving_link = Link(8,False)
-    hidden_neurons = 7
+    # TODO P4 accept neural network configuration and network topology from
+    # command line or input file
+    hidden_neurons = 7 
     max_send_queue = 5
     for i in range(1,5):
         sending_link.register(i,sending_agent(sending_link,CC.NCC(hidden_neurons,max_send_queue),i))

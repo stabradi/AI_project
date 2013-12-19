@@ -1,8 +1,10 @@
 Requires PyBrain, SciPy, and probably some others.
 
-Run the simulator with:
+Run the simulator withthis command:
 
 python simple_sim.py
 
-Output format:
+Do NOT run CC.py directly. It will not work. That program is deprecated.
+
+simple_sim.py output format:
 <TODO>
