@@ -1,0 +1,8 @@
+Requires PyBrain, SciPy, and probably some others.
+
+Run the simulator with:
+
+python simple_sim.py
+
+Output format:
+<TODO>
