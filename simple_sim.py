@@ -13,8 +13,10 @@ class Master_link:
         send_packets = self.sending_link.recv(100,0) # get up to 100 packets, they are cross network packets, so they have an addr of 0
         recv_packets = self.recving_link.recv(100,0)
         for p in send_packets:
+            print('p: '+str(p))
             self.sending_link.send(p[0],p[1])
         for p in recv_packets:
+            print('p: '+str(p))
             self.recving_link.send(p[0],p[1])
     def tock(self):
         self.sending_link.tick()
@@ -46,11 +48,11 @@ class Link:
         print(str(self.addr_buffer_pairs)+ ' ' + str(self.agent_side) + ' ' + str(addr))
         
         if self.agent_side and (addr < 0): 
-                    self.addr_buffer_pairs[0] += [(addr, p) for p in packets]
+                    self.addr_buffer_pairs[0] += [(addr, [p]) for p in packets]
                     self.addr_buffer_pairs[0] = self.addr_buffer_pairs[0][:self.queue_length]
                     return
         elif (not self.agent_side) and (addr > 0): 
-                    self.addr_buffer_pairs[0] += [(addr, p) for p in packets]
+                    self.addr_buffer_pairs[0] += [(addr, [p]) for p in packets]
                     self.addr_buffer_pairs[0] = self.addr_buffer_pairs[0][:self.queue_length]
                     return
         self.addr_buffer_pairs[addr] += packets
@@ -110,6 +112,8 @@ def main(argv=None):
         sending_link.register(i,sending_agent(sending_link,CC.NCC(hidden_neurons,max_send_queue),i))
         recving_link.register(0-i,recving_agent(recving_link,0-i))
     net = Master_link(sending_link,recving_link)
+    net.tock()
+    net.tock()
     net.tock()
 
 
