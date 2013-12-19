@@ -1,8 +1,7 @@
 import CC
 import sys
 
-# this is the global time, it goes up every tick, it is global
-global_time = 0
+
 # keeps track of the origin time of packets. Index with (origin addr, seq. no)
 otime = {}
 
@@ -24,6 +23,7 @@ class Master_link:
             print('p: '+str(p))
             self.recving_link.send(p[0],p[1])
     def tock(self):
+        global global_time
         self.sending_link.tick()
         self.recving_link.tick()
         global_time += 1                             # this is where the global time goes up
@@ -259,6 +259,9 @@ class TransmitSuccessEvent(SimEvent):
 def main(argv=None):
     if argv==None:
         argv = sys.argv
+    # this is the global time, it goes up every tick, it is global
+    global global_time
+    global_time = 0
     sending_link = Link(8,True)
     recving_link = Link(8,False)
     # TODO P4 accept neural network configuration and network topology from
