@@ -346,7 +346,8 @@
 
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
-
+\usepackage[pdftex]{graphicx}
+\graphicspath{{.}}
 
 \begin{document}
 %
@@ -460,10 +461,10 @@ halved (multiplicative decrease). AIMD produces a traffic profile called a
 ``sawtooth", in which the send rate is always approaching the current available
 network capacity. This sawtooth produces a lot of waste, as everytime the
 sawtooth dips, it's loosing efficiency. 
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=2.5in]{AIMD}
-
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.5in]{AIMD}
+\end{figure}
 
 
 \section{Background}
