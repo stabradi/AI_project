@@ -483,6 +483,10 @@ On page 2 of their paper, Winstein and Balakrishnan introduced a genetic algorit
 
 We shall run a network simulation with a randomly seeded neural net, then train it to convergence offline.Our utility function has three variables, alpha, beta, and gamma. Alpha rewards the algorithm for each sucessfully acknowledged package, while beta punishes it for every dropped package. Gamma punishes each packet every time a different packet gets dropped while the original packet waits in a queue. Each packet in a full queue when a new packet attempts to arrive and is blocked is punished because it was partially responsible for the congestion. Tuning this utility function is trial and error we didn't quite have time for, so we picked a few values that worked alright and went with them.
 
+\section{Results}
+We changed our simulation technique at the last minute, and implemented a
+homemade network simulator. The lack of a working simulator made it impossible to test the algorithm.
+
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
 % For figures, \caption should occur after the \includegraphics.
