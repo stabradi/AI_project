@@ -18,10 +18,10 @@ class Master_link:
         recv_packets = self.recving_link.recv(100,0)
         for p in send_packets:
             print('p: '+str(p))
-            self.sending_link.send(p[0],p[1])
+            self.recving_link.send(p[0],p[1])
         for p in recv_packets:
             print('p: '+str(p))
-            self.recving_link.send(p[0],p[1])
+            self.sending_link.send(p[0],p[1])
     def tock(self):
         global global_time
         self.sending_link.tick()
@@ -72,6 +72,8 @@ class Link:
                         pkt if recving_addr else pkt[1][0])
         #clear the sent packets from the buffer
         self.addr_buffer_pairs[recving_addr] = self.addr_buffer_pairs[recving_addr][number_of_packets:]
+        print ret
+        print recving_addr
         return ret
 
     def send(self,addr,packets):
@@ -131,7 +133,7 @@ class sending_agent:
         self.bandwidth = 3 # default bandwidth
         self.mission = 45 # default number of packets to be sent 
 
-        self.success = [] # Routine to call when we receive a valid ACK
+        self.success_events = [] # Routine to call when we receive a valid ACK
 
     def tick(self):
         self.handle_input(self.link.recv(self.bandwidth,self.host_addr))
@@ -145,9 +147,10 @@ class sending_agent:
         # call listeners
         for p in incoming_packets:
             for routine in self.success_events:
+                print otime
                 routine(global_time,
                         self.host_addr,
-                        dst,
+                        1-self.host_addr,
                         "agent %d" % self.host_addr,
                         p,
                         otime[(self.host_addr,p)])
@@ -157,18 +160,20 @@ class sending_agent:
         global global_time
         rtn = self.cc.get_pending_sends()
         for pkt in rtn:
+            print "new otime:"
             otime[(self.host_addr, pkt)] = global_time
+            print otime
         return rtn
 
     def on_success(self, routine):
-        self.success.append(routine)
+        self.success_events.append(routine)
 
 class recving_agent:
     def __init__(self,link,addr):
         self.link = link
         self.addr_host = addr
         self.goal_addr = 0-addr # see sending_agent.goal_addr for an explanation
-        self.last_in_order_seq = -1 # -1 means we have received no packets yet.
+        self.last_in_order_seq = 0 # we have received no packets yet.
         self.out_of_order_seqs = []
         self.sndQ = []
         self.bandwidth = 3 # default bandwidth

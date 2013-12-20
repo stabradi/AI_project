@@ -67,9 +67,9 @@ class NCC:
         self.rtt_ratio = 1 # Latest RTT divided by minimum observed RTT
 
         self.number_of_packets_to_send = 0
-        self.next_unsent = 0
+        self.next_unsent = 1
         self.packet_ack_log = {}
-        self.last_ack_in_seq = -1
+        self.last_ack_in_seq = 0
         self.ticks = 0
 
     def enqueue(self,packet):
