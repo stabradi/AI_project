@@ -565,10 +565,12 @@ We shall run a network simulation with a randomly seeded neural net, then train 
 % footnotes above bottom floats. This can be corrected via the \fnbelowfloat
 % command of the stfloats package.
 
+\section{Results}
+Unfortunately, we were unable to test our algorithm as our network simulator never worked. We spent a lot of time attempting to get Network Simulator 2 (NS) to work. Right before it appeared to work, it was revealed that the behavior we desired was unreasonably difficult to implement. In order to circumvent these difficulties, we have attempted to create our own network simulator, specially tailored to our problem. We did not realize how difficult this would be, and doing it last minute was probably a bad idea. In retrospect, we should have left NS sooner, since the lost time we could have used developing our simulator. We speculate that we lost almost thirty manhours on NS. Our simulator is currently sending packets without us ever creating them, and is also acknowledging packets that don't exist. We cannot do a reasonable study under these conditions, and must move on. We anticipate that the project is still worthwhile to pusue and may revisit it at a later date.
 
 
 \section{Conclusion}
-The conclusion goes here.
+It is extremely disheartening to put a decent amount of work in an AI, get it more or less working, then having the testbed fail horrifically. The testbed turned out to be a monumentous task, and one that we reasonably could only finish if we hadn't sunk so much time into NS. 
 
 
 
@@ -580,8 +582,7 @@ The conclusion goes here.
 \section*{Acknowledgment}
 
 
-The authors would like to thank...
-
+The authors would like to thank Winstein and Balakrishnan for providing what seems to be the only research in applying AI to TCP.
 
 
 
