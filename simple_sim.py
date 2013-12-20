@@ -56,18 +56,26 @@ class Link:
     # Return the first x packets from the buffer for address y, then clear that
     # x packets. The caller knows how much data its link allows, so it requests
     # that much data per tick.
-    def recv(self,number_of_packets,recving_addr): 
+    def recv(self,number_of_packets,recving_addr):
+        global global_time
         # get the first x packets
         ret = self.addr_buffer_pairs[recving_addr][:number_of_packets]
         # Trigger listeners
         for pkt in self.addr_buffer_pairs[recving_addr]:
             for routine in self.send_events:
-                routine(global_time,self,recving_addr,pkt)
+                # If recving_addr is 0, it means the packet is a tuple of (final
+                # destination, seq_no; we need to unpack it.
+                routine(global_time,
+                        0-recving_addr if recving_addr else 0-pkt[0],
+                        recving_addr if recving_addr else pkt[0],
+                        "lnk_0" if self.agent_side else "lnk_1",
+                        pkt if recving_addr else pkt[1][0])
         #clear the sent packets from the buffer
         self.addr_buffer_pairs[recving_addr] = self.addr_buffer_pairs[recving_addr][number_of_packets:]
         return ret
 
     def send(self,addr,packets):
+        global global_time
         bpairs = self.addr_buffer_pairs # temporary variable
         # this is how you denote whether the link is on the side of the sender
         # or the reciever, it creates something like
@@ -86,7 +94,11 @@ class Link:
             drops = bpairs[0][self.queue_length:]
             for pkt in drops:
                 for routine in self.drop_events:
-                    routine(global_time,self,pkt,0-addr,addr)
+                    routine(global_time,
+                            0-addr if addr else 0-pkt[0],
+                            addr if addr else pkt[0],
+                            "link_0" if self.agent_side else "link_1",
+                            pkt if addr else pkt[1][0])
             # Drop the packets
             bpairs[0] = bpairs[0][:self.queue_length]
         # Some traffic is "through" traffic.
@@ -129,13 +141,20 @@ class sending_agent:
     # We only ever receive ACKs; our CC figures out when to retransmit based
     # on the ACKs we receive.
     def handle_input(self,incoming_packets):
+        global global_time
         # call listeners
         for p in incoming_packets:
             for routine in self.success_events:
-                routine(global_time,self,dst,p,otime[(self.host_addr,p)])
+                routine(global_time,
+                        self.host_addr,
+                        dst,
+                        "agent %d" % self.host_addr,
+                        p,
+                        otime[(self.host_addr,p)])
             self.cc.handle_ack(p)
 
     def generate_packets(self):
+        global global_time
         rtn = self.cc.get_pending_sends()
         for pkt in rtn:
             otime[(self.host_addr, pkt)] = global_time
@@ -201,58 +220,67 @@ class Oracle:
     def flush_logs(self):
         for event in self.events[self.logloc:]:
             for f in self.logfiles:
-                f.write("Writing an event to a file!\n")
+                f.write(event.log_str())
         self.logloc = len(self.events)
 
-    def drop(self, time, obj, seqno, src, dst):
-        self.events.append(DropEvent(time, obj, seqno, src, dst))
+    def drop(self, time, src, dst, obj, seqno):
+        self.events.append(DropEvent(time, src, dst, obj, seqno))
         print "Drop!"
 
-    def enQ(self, time, src, dst, seqno):
-        self.events.append(EnQEvent(time,src,seqno,dst))
+    def enQ(self, time, src, dst, obj, seqno):
+        self.events.append(EnQEvent(time, src, dst, obj, seqno))
     
-    def success(self, time, src, dst, seqno, sent):
+    def success(self, time, src, dst, obj, seqno, sent):
         self.events.append(TransmitSuccessEvent(time,src,seqno,dst,sent))
         print "Success"
 
-    def send(self, time, src, dst, seqno):
-        self.events.append(SendEvent(time, src, seqno, dst))
+    def send(self, time, src, dst, obj, seqno):
+        self.events.append(SendEvent(time, src, dst, obj, seqno))
 
-    def recv(self, time, src, dst, seqno):
-        self.events.append(RecvEvent(time, dst, seqno, src))
+    def recv(self, time, src, dst, obj, seqno):
+        self.events.append(RecvEvent(time, src, dst, obj, seqno))
 
 # Base class for simulation events. DO NOT INSTANTIATE.
 class SimEvent:
-    def __init__(self, time, obj, seqno):
+    def __init__(self, symbol, time, src, dst, obj, seqno):
         self.time = time # simulation time the event was reported
+        self.src = src # the address that originated the packet
+        self.dst = dst # the destination address of the packet
         self.obj = obj # the simulation object reporting the event
         self.seqno = seqno # sequence number of packet
+        self.symbol = symbol # symbol to represent this event type in a log file
+    def log_str(self):
+        print "--------------"
+        print self.symbol
+        print self.time
+        print self.src
+        print self.dst
+        print self.seqno
+        return "%s %4d %s %d %d %4d" % \
+            (self.symbol, self.time, self.obj, self.src, self.dst, self.seqno)
     
 class EnQEvent(SimEvent):
-    def __init__(self, time, obj, seqno):
-        SimEvent.__init__(self, time, obj, seqno)
+    def __init__(self, time, src, dst, obj, seqno):
+        SimEvent.__init__(self, "Q", time, src, dst, obj, seqno)
 
 class SendEvent(SimEvent):
-    def __init__(self, time, src, seqno, dst):
-        SimEvent.__init__(self, time, src, seqno)
+    def __init__(self, time, src, dst, obj, seqno):
+        SimEvent.__init__(self, "S", time, src, dst, obj, seqno)
         self.dst = dst
 
 class RecvEvent(SimEvent):
-    def __init__(self, time, dst, seqno, src):
-        SimEvent.__init__(self, time, dst, seqno)
+    def __init__(self, time, src, dst, obj, seqno):
+        SimEvent.__init__(self, "R", time, src, dst, obj, seqno)
         self.src = src
 
 class DropEvent(SimEvent):
-    def __init__(self, time, obj, seqno, src, dst):
-        SimEvent.__init__(self, time, obj, seqno)
-        self.src = src
-        self.dst = dst
+    def __init__(self, time,src, dst, obj, seqno):
+        SimEvent.__init__(self, "D", time, src, dst, obj, seqno)
 
 # Signifies the receipt of an acknowledgment by a sender
 class TransmitSuccessEvent(SimEvent):
-    def __init__(self, time, src, seqno, dst, sent):
-        SimEvent.__init__(self, time, src, seqno)
-        self.dst = dst
+    def __init__(self, time, obj, src, dst, seqno, sent):
+        SimEvent.__init__(self, "A", time, src, dst, obj, seqno)
         self.sent = sent # Simulation time the packet was sent
         self.rtt = time - sent # Round trip time for this packet
 
