@@ -401,12 +401,16 @@ Fax: (888) 555--1212}}
 
 \begin{abstract}
 %\boldmath
-Recent research has used Artificial Intelligence to identify alternative congestion control
-mechanisms for the Transmission Control Protocol (TCP) that resulted in significant performance increase;
-however, the mechanisms in question were only tested at full (100\%)
-adoption, leaving a nigh-insurmountable barrier of entry for the revised protocol. Our research seeks to find alternative mechanisms that improve performance on networks that do not have full adoption, even for those who do not adopt. We expect to find
+Recent research has used Artificial Intelligence to identify alternative
+congestion control mechanisms for the Transmission Control Protocol (TCP) that
+resulted in significant performance increase; however, the mechanisms in
+question were only tested at full (100\%) adoption, leaving a
+nigh-insurmountable barrier of entry for the revised protocol. Our research
+seeks to find alternative mechanisms that improve performance on networks that
+do not have full adoption, even for those who do not adopt. We expected to find
 some alternative mechanisms that achieve better performance than the current
-TCP congestion control mechanism at many or all adoption rates. While our AI itself seemed to work fine, our network simulator had issues. We therefore could not collect results.
+TCP congestion control mechanism at many or all adoption rates, but we were
+unable to implement the simulation environment needed to train our algorithm.
 \end{abstract}
 
 
@@ -424,12 +428,38 @@ TCP congestion control mechanism at many or all adoption rates. While our AI its
 
 
 \section{Introduction}
-Many aspects of TCP's existing congestion control mechanism appear to have
-been selected out of convenience rather than carefully chosen to maximize performance.
-For instance, when in the additive-increase/multiplicative-decrease (AIMD) mode, each successful packet transmission increases the size of the TCP sliding window by one, while each dropped packet cuts it in half. It seems many parameters were chosen because they were simple, not because they were the best. Our project endeavored to use an intelligent system to develop a more effective congestion control mechanism. AIMD has been improved on, most recently in TCP New Reno [REF]; however, never has the congestion control mechanism been designed by an artificial intelligence. A small amount of prior work has explored this [WB], but the work on the problem has been limited and largely theoretical. While our work is definitely still on the theoretical side, it attempts to solve the practical problem of adoption. We show that a neural net can be trained to deal with mixed levels of adoption. We ran simulations where some of our end hosts use the AIMD protocol while others use a protocol defined by a neural net.
+Many aspects of TCP's existing congestion control mechanism appear to have been
+selected out of convenience rather than carefully chosen to maximize
+performance. For instance, when in the additive-increase/multiplicative-decrease
+(AIMD) mode, each successful packet transmission increases the size of the TCP
+sliding window by one, while each dropped packet cuts it in half. It seems many
+parameters were chosen because they were simple, not because they were the best.
+Our project endeavored to use an intelligent system to develop a more effective
+congestion control mechanism. AIMD has been improved on, most recently in TCP
+New Reno [2]; however, the congestion control mechanism has never been
+designed by an artificial intelligence. A small amount of prior work has
+explored this possibility [1], but the work on the problem has been limited and
+largely theoretical. While our work is definitely still on the theoretical side,
+it begins to look at the practical problem of adoption. We show a neural
+network that can be trained to deal with mixed levels of adoption, with some
+hosts running an existing congestion control mechanism, and some running an
+algorithm specified by the neural network.
 
 \subsection{TCP Congestion Control}
-RFC 5681 specifies a congestion control mechanism for TCP called additive-increase/multiplicative-decrease (AIMD) to avoid flooding networks with more traffic than they can carry. Sending more data through a link than it is able to handle causes packet loss, introducing significant amounts of waste traffic which will consume resources without improving end to end data throughput. The congestion control mechanism currently used in TCP is known as the sliding window. The sliding window keeps track of the number of packets sent-but-not-acknowledged, and only allows $n$ packets to be in this state. When a packet is successfully acknowledged, $n$ is increased by one (additive increase); conversely, when a packet is lost, requiring retransmission, $n$ is halved (multiplicative decrease). AIMD produces a traffic profile called a ``sawtooth", in which the send rate is always approaching the current available network capacity. This sawtooth produces a lot of waste, as everytime the sawtooth dips, it's loosing efficiency. 
+RFC 5681 specifies a congestion control mechanism for TCP called
+additive-increase/multiplicative-decrease (AIMD) to avoid flooding networks with
+more traffic than they can carry. Sending more data through a link than it is
+able to handle causes packet loss, introducing significant amounts of waste
+traffic which will consume resources without improving end to end data
+throughput. The congestion control mechanism currently used in TCP is known as
+the sliding window. The sliding window keeps track of the number of packets
+sent-but-not-acknowledged, and only allows $n$ packets to be in this state. When
+a packet is successfully acknowledged, $n$ is increased by one (additive
+increase); conversely, when a packet is lost, requiring retransmission, $n$ is
+halved (multiplicative decrease). AIMD produces a traffic profile called a
+``sawtooth", in which the send rate is always approaching the current available
+network capacity. This sawtooth produces a lot of waste, as everytime the
+sawtooth dips, it's loosing efficiency. 
 %\begin{figure}[!t]
 %\centering
 %\includegraphics[width=2.5in]{AIMD}
@@ -439,53 +469,97 @@ RFC 5681 specifies a congestion control mechanism for TCP called additive-increa
 \section{Background}
 
 \subsection{Related Work}
-TCP ex Machina is a suggested TCP congestion control mechanism created in 2013 by Keith 
-Winstein and Hari Balakrishnan, from Massachusetts Institute of Technology, with the help of a neural net informed by a
-genetic algorithm. While their simulations found TCP ex Machina's network performance was
-better than current TCP congestion control. Their results were rather impressive, but they noted that they only simulated performance in the case of full
-adoption. Since full adoption never happens immediately in real life, a mechanism that is only optimized for full adoption will not be adopted in the first place.
+Remy is a program, created in 2013 by Keith Winstein and Hari Balakrishnan at
+the Massachusetts Institute of Technology, that designs TCP congestion control
+mechanisms called RemyCCs. Their simulations found that properly informed
+RemyCCs performed far better than current TCP congestion control. The results
+were impressive, but Winstein and Balakrishnan noted that they only simulated
+performance in the case of full adoption of the RemyCC algorithm. Since full
+adoption never happens immediately in real life, a mechanism that is only
+optimized for full adoption will never be adopted in the first place.
 
+We sought to address this gap in Winstein's and Balakrishnan's research by
+creating a neural network that would seek to optimize performance at all
+adoption levels, creating a protocol that is not only better in theory, but also
+more likely to be adopted in practice.
 
-We seek to address the gap in Winstein's and Balakrishnan's research by creating a different
-genetic algorithm that will seek to optimize performance at all adoption levels, creating a protocol that is not only better in theory, but also more likely to be adopted in practice. Unfortunately, it is a relatively recent issue, and while some others have tackled the problem of impoving TCP, none have done it with AI. Winstein and Balakrishnan themselves had no references to similar works.
+Unfortunately, it is a relatively recent issue, and while some others have tackled the problem of impoving TCP, none have done it with AI. Winstein and Balakrishnan themselves had no references to similar works.
 
 \subsection{Problem Statement}
-Our goal is to eliminate as much unnecessary waste of network utilization. As part of the goal, the mechanism must have a few properties. First and foremost, it must be fair. If the machines on the system worsen performance for non-adopters, then the algorithm is considered completely non-viable. Secondly, the mechanism must actually improve network utilization compared to the baseline, in our case, AIMD. Finally, our algorithm must have a somewhat stable result. If from run to run the algorithm varies in performance wildly, the product may be practically unusable.
+Our goal wass to improve network performance (as measured by throughput and
+latency) as much as possible by eliminating unnecessary waste. A congestion
+control mechanism seeks to satisfy have a few properties. First and foremost, it
+must be fair. If the new congestion control algorithms on the network worsen
+performance for non-adopters, then the algorithm is completely non-viable.
+Secondly, the mechanism must actually improve network utilization compared to
+the baseline (in our case, AIMD). Finally, the algorithm must have a somewhat
+stable result. If from run to run the algorithm varies in performance wildly, 
+the product may be practically unusable.
 
 \section{Methodology}
 % Replace Winstein and Balakrishnan with special citation command
-We attempted to generate an improved TCP congestion control mechanism using a genetic algorithm similar to the approach outlined by Winstein and Balakrishnan, with the special requirement that the algorithm must perform well \textit{at low adoption rates} for both adopters and non-adopters. 
+We attempted to generate an improved TCP congestion control mechanism using a
+neural network similar to the approach outlined by Winstein and Balakrishnan,
+with the special requirement that the algorithm must perform well \textit{at low
+adoption rates} for both adopters and non-adopters. 
 \subsection{Simulation Network}
 Any structured machine learning algorithm needs to be able to evaluate 
 the performance results of an action, and to evaluate performance an agent 
-needs data. We created a program that will simulate a wide-area 
-network (WAN) with properties that resemble the Internet. The 
-program will uses a directed graph to represent the simulation network,
-with nodes representing hosts and edges representing links. Some nodes
-will be end hosts which try to open TCP connections with one another 
-and transmit data, and other nodes will be routers which try to 
-faithfully carry packets. When the simulation begins running,
-each sender node attempts to send $m$ packets, where $m$ is an arbitrary
-but consistent number. Once those packets are sent, the simulation ends. Our
-grading criteria for how well our network did depends on how many packets had
-to be retransmitted and how many 'ticks' (single unit of time in the simulator) it ran for.
-The less packets that had to be retransmitted and the less ticks it took, the better the
-mechanism performed.  
+needs data. We created a program to simulate a dumbell-shaped network 
+with properties that resemble the network topology of a street's cable network
+(the local cable uplink is usually the bottleneck for a typical home internet
+user). The simulation network can be seen as a directed graph,
+with nodes representing hosts and edges representing links. Five nodes are
+local end hosts which try to open TCP connections and send data to remote hosts
+on the other side of the bottleneck link, five remote hosts which accept and
+respond to the messages sent by the local nodes, and an overloaded bottleneck
+link with a drop-tail queue eviction strategy. When the simulation begins
+running, each sender node attempts to send $m$ packets, where $m$ is an
+arbitrary but consistent number. Once those packets are sent, the simulation
+ends. Our grading criteria for how well our network did depends on how many
+packets had to be retransmitted, and how many 'ticks' (single unit of time in
+the simulator) it ran for. The fewer packets had to be retransmitted and the
+fewer ticks it took, the better the mechanism performed.  
+
 The network topology we chose was the dumbell topology. We chose this because
-it is the same topology the Internet uses.
-similar enough to the Internet. Our network consists of a series of end
-hosts that send data over a router, which then passes the data on to recievers.
-The recievers can then The simulation network will monitor and record network 
+it matches the layout of an internet service provider's street gateway, with one
+router trying to queue packets for dozens of houses on its subnet. Our
+network consists of a series of end hosts that send data over a router, which
+then passes the data on to recievers. The recievers simply track and acknowledge
+received packets. The simulation network monitors and records network
 performance data for later analysis.
 
 \subsection{Training the Neural Net}
-On page 2 of their paper, Winstein and Balakrishnan introduced a genetic algorithm to inform a neural network that affected TCP ex Machina's congestion control properties. Their reasoning, as they say, was that ``the best way to approach this question is to take the design of specific algorithmic mechanisms out of the hands of human designers (no matter how sophisticated!), and make the end-to-end algorithm be a function of the desired overall behavior." We agree with their reasoning, and commend their eloquence. We will use their methods and mindset to generate our own research, which will expand on their work, generalizing their solution to cases where only partial adoption of our mechanism exists, though ours will have to account for varying degrees of adoption. This way, end hosts that use our mechanism can exist in harmony with those that do not. There are three inputs to their neural net: an exponentially weighted moving average of the time between packet sends, an exponentially weighted moving average of the time between received acknowlegements, and the ratio of round-trip time (the time it takes for a packet to reach its destination and get acknowledged) to the mimum observed round-trip time for that link. We used backpropogation to train our neural net, as opposed to their genetic algorithm. These three inputs form an observable state our net can act on. 
+Winstein and Balakrishnan's reasoning for using artificial intelligence was, as
+they say, was that ``the best way to approach this question [of congestion
+control] is to take the design of specific algorithmic mechanisms out of the
+hands of human designers (no matter how sophisticated!), and make the end-to-end
+algorithm be a function of the desired overall behavior." We agree with their
+reasoning, and commend their eloquence. We will use their mindset to generate
+our own research, which will expand on their work, generalizing their approach
+to cases where only partial adoption of our mechanism exists, though ours will
+have to account for varying degrees of adoption. This way, end hosts that use
+our mechanism can exist in harmony with those that do not. There are three
+inputs to the neural net: an exponentially weighted moving average of the
+time between packet sends, an exponentially weighted moving average of the time
+between received acknowlegements, and the ratio of round-trip time (the time it
+takes for a packet to reach its destination and get acknowledged) to the minmum
+observed round-trip time for that link. These three inputs form an observable
+state our net can act on.
 
-We shall run a network simulation with a randomly seeded neural net, then train it to convergence offline.Our utility function has three variables, alpha, beta, and gamma. Alpha rewards the algorithm for each sucessfully acknowledged package, while beta punishes it for every dropped package. Gamma punishes each packet every time a different packet gets dropped while the original packet waits in a queue. Each packet in a full queue when a new packet attempts to arrive and is blocked is punished because it was partially responsible for the congestion. Tuning this utility function is trial and error we didn't quite have time for, so we picked a few values that worked alright and went with them.
+We used backpropogation to train our neural net. The plan was to
+simulation with a randomly seeded neural net, then train it to convergence
+offline. Our utility function has three variables. $\alpha$
+rewards the algorithm for each sucessfully acknowledged package, while $\beta$
+punishes it for every dropped package. $\gamma$ punishes each packet that causes
+another packet to be dropped. When a new packet arrives at a link and is dropped
+from the queue, every packet waiting in that queue is penalized for causing
+congestion. Tuning these constants is a matter of trial and error.
 
 \section{Results}
 We changed our simulation technique at the last minute, and implemented a
-homemade network simulator. The lack of a working simulator made it impossible to test the algorithm.
+homemade network simulator. The lack of a working simulator made it impossible
+to test the algorithm.
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
@@ -615,9 +689,13 @@ The authors would like to thank Winstein and Balakrishnan for providing what see
 % (used to reserve space for the reference number labels box)
 \begin{thebibliography}{1}
 
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+\bibitem{TCP ex Machina}
+K.~Winstien and H. ~Balakrishnan, \emph{TCP ex machina: computer-generated congestion control}, \hskip 1em plus
+  0.5em minus 0.4em\relax Proceedings of the ACM SIGCOMM 2013 conference on SigCOMM. ACM, New York, NY, USA 123-124
+
+\bibitem{TC_ Congestion Control}
+M. ~Allman, V. ~Paxman, E. ~blanton, \emph{TCP Congestion Control} \hskip 1em plus
+  0.5em minus 0.4em\relax IETF RFC 56811 September 2009 available: http://tools.ietf.org/html/rfc5681
 
 \end{thebibliography}
 
