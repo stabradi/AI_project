@@ -406,7 +406,7 @@ mechanisms for the Transmission Control Protocol (TCP) that resulted in signific
 however, the mechanisms in question were only tested at full (100\%)
 adoption, leaving a nigh-insurmountable barrier of entry for the revised protocol. Our research seeks to find alternative mechanisms that improve performance on networks that do not have full adoption, even for those who do not adopt. We expect to find
 some alternative mechanisms that achieve better performance than the current
-TCP congestion control mechanism at many or all adoption rates.
+TCP congestion control mechanism at many or all adoption rates. While our AI itself seemed to work fine, our network simulator had issues. We therefore could not collect results.
 \end{abstract}
 
 
@@ -447,7 +447,7 @@ adoption. Since full adoption never happens immediately in real life, a mechanis
 
 
 We seek to address the gap in Winstein's and Balakrishnan's research by creating a different
-genetic algorithm that will seek to optimize performance at all adoption levels, creating a protocol that is not only better in theory, but also more likely to be adopted in practice.
+genetic algorithm that will seek to optimize performance at all adoption levels, creating a protocol that is not only better in theory, but also more likely to be adopted in practice. Unfortunately, it is a relatively recent issue, and while some others have tackled the problem of impoving TCP, none have done it with AI. Winstein and Balakrishnan themselves had no references to similar works.
 
 \subsection{Problem Statement}
 Our goal is to eliminate as much unnecessary waste of network utilization. As part of the goal, the mechanism must have a few properties. First and foremost, it must be fair. If the machines on the system worsen performance for non-adopters, then the algorithm is considered completely non-viable. Secondly, the mechanism must actually improve network utilization compared to the baseline, in our case, AIMD. Finally, our algorithm must have a somewhat stable result. If from run to run the algorithm varies in performance wildly, the product may be practically unusable.
